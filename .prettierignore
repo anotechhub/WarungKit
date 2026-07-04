@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+.wrangler
+.turbo
+pnpm-lock.yaml
+supabase/migrations
+docs/decisions
+Docs/decisions

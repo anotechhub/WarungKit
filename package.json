@@ -1,0 +1,19 @@
+{
+  "name": "warungkit",
+  "version": "0.0.0",
+  "private": true,
+  "description": "WarungKit — secure digital storefront webinar demo for Indonesian UMKM.",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "lint": "echo \"lint: no lintable packages yet — will run pnpm -r lint once apps/packages are scaffolded\"",
+    "typecheck": "echo \"typecheck: no TypeScript projects yet — will run pnpm -r typecheck once apps/packages are scaffolded\"",
+    "test": "echo \"test: no test suites yet — will run pnpm -r test once apps/packages are scaffolded\"",
+    "build": "echo \"build: no buildable packages yet — will run pnpm -r build once apps/packages are scaffolded\"",
+    "format": "prettier --check .",
+    "format:write": "prettier --write ."
+  }
+}
