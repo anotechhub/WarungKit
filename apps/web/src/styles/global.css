@@ -12,6 +12,10 @@
   --orange-deep: #ca4312;
   --orange-soft: #fff0e8;
   --green: #39a852;
+  --red: #c1442b;
+  --red-soft: #fdece7;
+  --neutral-muted: #6b6670;
+  --neutral-soft: #f1eeeb;
   --shadow-sm: 0 10px 30px rgba(28, 24, 20, 0.06);
   --shadow-lg: 0 28px 70px rgba(28, 24, 20, 0.10);
   font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -129,3 +133,30 @@ img { display: block; max-width: 100%; }
 .checkout-empty-state p { margin: 0 0 24px; color: var(--ink-soft); font-size: 14px; line-height: 1.6; }
 
 .status-check-action { display: flex; justify-content: center; margin: -8px 0 28px; }
+
+/* Payment status tones — success (paid), warning (expired), error (failed), neutral (cancelled). Pending reuses the existing --preview orange tone. */
+.success-card--success .success-icon { background: var(--green); border-color: #e8f8ec; box-shadow: 0 0 0 10px rgba(57,168,82,.08); }
+.success-card--success h2 { color: var(--green); }
+.success-card--warning .success-icon { background: #b8842f; border-color: #fdf3e2; box-shadow: 0 0 0 10px rgba(184,132,47,.08); }
+.success-card--warning h2 { color: #9c6b1f; }
+.success-card--error .success-icon { background: var(--red); border-color: var(--red-soft); box-shadow: 0 0 0 10px rgba(193,68,43,.08); }
+.success-card--error h2 { color: var(--red); }
+.success-card--neutral .success-icon { background: var(--neutral-muted); border-color: var(--neutral-soft); box-shadow: 0 0 0 10px rgba(107,102,112,.08); }
+.success-card--neutral h2 { color: var(--neutral-muted); }
+
+.status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; border-radius: 6px; font-size: 12px; }
+.status-pill--pending { color: #a54a24 !important; background: var(--orange-soft); }
+.status-pill--success { color: #26933f !important; background: #eaf8ed; }
+.status-pill--warning { color: #9c6b1f !important; background: #fdf3e2; }
+.status-pill--error { color: var(--red) !important; background: var(--red-soft); }
+.status-pill--neutral { color: var(--neutral-muted) !important; background: var(--neutral-soft); }
+
+.polling-note { max-width: 720px; margin: -8px auto 28px; text-align: center; color: var(--ink-soft); font-size: 12px; }
+
+.checkout-warning--error { border-color: #f0b5a2; color: var(--red); background: var(--red-soft); display: flex; align-items: center; gap: 8px; }
+
+.skeleton-line--centered { margin-left: auto; margin-right: auto; }
+.status-card--skeleton { display: grid; gap: 14px; justify-items: center; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin-icon { animation: spin 0.9s linear infinite; }

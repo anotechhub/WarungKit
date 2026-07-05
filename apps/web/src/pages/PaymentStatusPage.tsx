@@ -1,40 +1,246 @@
-import { Clock, Copy, Download, Headphones, Mail, MessageCircle, RefreshCcw, ShieldCheck } from 'lucide-react'
+import { AlertTriangle, Ban, Check, Clock, Download, Headphones, Mail, MessageCircle, RefreshCcw, ShieldCheck, XCircle } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
-import { formatIdr, maskEmail, maskPhone } from '../lib/format'
+import { ApiClientError, getOrderStatus } from '../lib/api'
+import { formatIdr } from '../lib/format'
+import type { OrderStatusResponse } from '@warungkit/contracts'
 
-// SECURITY (non-negotiable): payment state on this page must never be marked
-// "paid" from the URL query parameter, local component state, mock/preview
-// data, or a redirect back from the payment provider. A redirect is a UX
-// event only, not proof of payment. Real payment state will be populated
-// exclusively from GET /api/orders/:orderId (called with the order's receipt
-// token) once the P8 backend is implemented — that endpoint currently
-// returns 501 NOT_IMPLEMENTED, so this page renders an unverified/pending
-// state unconditionally, regardless of what appears in the URL.
+const POLL_INTERVAL_MS = 3_000
+const POLL_TIMEOUT_MS = 45_000
+
+// UUID check only — never a stricter/looser check that might accidentally
+// accept a malformed token and forward it to the backend.
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+type ViewState =
+  | { kind: 'missing-params' }
+  | { kind: 'loading' }
+  | { kind: 'error'; message: string }
+  | { kind: 'result'; data: OrderStatusResponse }
+
+const STATUS_META: Record<
+  OrderStatusResponse['status'],
+  { title: string; tone: 'pending' | 'success' | 'warning' | 'error' | 'neutral' }
+> = {
+  pending: { title: 'Menunggu Konfirmasi Pembayaran', tone: 'pending' },
+  payment_created: { title: 'Menunggu Konfirmasi Pembayaran', tone: 'pending' },
+  paid: { title: 'Pembayaran Berhasil', tone: 'success' },
+  expired: { title: 'Pembayaran Kedaluwarsa', tone: 'warning' },
+  failed: { title: 'Pembayaran Belum Berhasil', tone: 'error' },
+  cancelled: { title: 'Pesanan Dibatalkan', tone: 'neutral' },
+}
+
+const TONE_ICON = {
+  pending: Clock,
+  success: Check,
+  warning: AlertTriangle,
+  error: XCircle,
+  neutral: Ban,
+} as const
+
+// SECURITY (non-negotiable): payment state on this page is only ever
+// populated from a validated GET /api/orders/:orderId response — never from
+// the URL query parameters themselves, local state, mock/preview data, or a
+// redirect back from the payment provider. A redirect is a UX event only,
+// not proof of payment. The receipt token is read from the URL solely to
+// forward it to the backend as a query parameter — it is never rendered,
+// never logged, and never included in any error message.
 export function PaymentStatusPage() {
   const [searchParams] = useSearchParams()
-  const isPreview = !searchParams.get('orderId')
-  const previewEmail = maskEmail('laila@warungkit.id')
-  const previewPhone = maskPhone('08123456789')
+  const orderId = searchParams.get('orderId')
+  const token = searchParams.get('token')
+
+  const hasValidParams = Boolean(orderId && token && uuidPattern.test(orderId) && uuidPattern.test(token))
+
+  const [view, setView] = useState<ViewState>(hasValidParams ? { kind: 'loading' } : { kind: 'missing-params' })
+  const [pollingActive, setPollingActive] = useState(hasValidParams)
+  const [manualChecking, setManualChecking] = useState(false)
+
+  const pollStartRef = useRef<number>(Date.now())
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const fetchStatus = useCallback(async () => {
+    if (!orderId || !token) return
+    try {
+      const data = await getOrderStatus(orderId, token)
+      setView({ kind: 'result', data })
+    } catch (caught) {
+      const message =
+        caught instanceof ApiClientError
+          ? caught.message
+          : 'Terjadi kendala saat memeriksa status pesanan. Silakan coba lagi.'
+      setView({ kind: 'error', message })
+    }
+  }, [orderId, token])
+
+  useEffect(() => {
+    if (!hasValidParams) return
+
+    pollStartRef.current = Date.now()
+    setPollingActive(true)
+
+    // Initial fetch immediately.
+    void fetchStatus()
+
+    intervalRef.current = setInterval(() => {
+      if (Date.now() - pollStartRef.current >= POLL_TIMEOUT_MS) {
+        if (intervalRef.current) clearInterval(intervalRef.current)
+        setPollingActive(false)
+        return
+      }
+      void fetchStatus()
+    }, POLL_INTERVAL_MS)
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [hasValidParams, fetchStatus])
+
+  async function handleManualCheck() {
+    if (manualChecking) return
+    setManualChecking(true)
+    try {
+      await fetchStatus()
+    } finally {
+      setManualChecking(false)
+    }
+  }
+
+  if (view.kind === 'missing-params') {
+    return (
+      <>
+        <SiteHeader />
+        <main className="status-page section-shell">
+          <Link to="/" className="back-link">← Kembali ke Beranda</Link>
+          <section className="checkout-empty-state">
+            <div className="checkout-empty-state__icon"><AlertTriangle size={34} /></div>
+            <h1>Data Pesanan Tidak Lengkap</h1>
+            <p>Tautan status pembayaran ini tidak lengkap atau tidak valid. Silakan kembali ke beranda dan gunakan tautan yang dikirimkan setelah checkout.</p>
+            <Link className="button button--accent" to="/">Kembali ke Beranda</Link>
+          </section>
+        </main>
+        <SiteFooter />
+      </>
+    )
+  }
+
+  if (view.kind === 'loading') {
+    return (
+      <>
+        <SiteHeader />
+        <main className="status-page section-shell">
+          <Link to="/" className="back-link">← Kembali ke Beranda</Link>
+          <div className="status-title"><p className="eyebrow">Memeriksa status</p><h1>Status Pembayaran</h1><p>Memuat status pesanan Anda…</p></div>
+          <section className="success-card success-card--preview status-card--skeleton" aria-busy="true">
+            <div className="skeleton-line skeleton-line--heading skeleton-line--centered" />
+            <div className="skeleton-line skeleton-line--centered" />
+          </section>
+        </main>
+        <SiteFooter />
+      </>
+    )
+  }
+
+  if (view.kind === 'error') {
+    return (
+      <>
+        <SiteHeader />
+        <main className="status-page section-shell">
+          <Link to="/" className="back-link">← Kembali ke Beranda</Link>
+          <div className="status-title"><p className="eyebrow">Terjadi kendala</p><h1>Status Pembayaran</h1><p>{view.message}</p></div>
+          <div className="status-check-action">
+            <button className="button button--ghost" onClick={handleManualCheck} disabled={manualChecking} aria-busy={manualChecking}>
+              <RefreshCcw size={16} /> Cek Status Pembayaran
+            </button>
+          </div>
+        </main>
+        <SiteFooter />
+      </>
+    )
+  }
+
+  const { data } = view
+  const meta = STATUS_META[data.status]
+  const Icon = TONE_ICON[meta.tone]
+  const isPaid = data.status === 'paid'
 
   return (
     <>
       <SiteHeader />
       <main className="status-page section-shell">
         <Link to="/" className="back-link">← Kembali ke Beranda</Link>
-        <div className="status-title"><p className="eyebrow">Menunggu konfirmasi backend</p><h1>Status Pembayaran</h1><p>{isPreview ? 'Preview UI untuk status pembayaran yang akan dihubungkan ke API order pada P8.' : 'Status pesanan Anda akan tampil di sini setelah endpoint GET /api/orders/:orderId (P8) tersedia dan backend memverifikasi pembayaran.'}</p></div>
-        <section className="success-card success-card--preview"><div className="success-icon"><Clock size={38} /></div><h2>Menunggu Konfirmasi Pembayaran</h2><p>Status final ("paid") hanya akan ditampilkan setelah backend memverifikasi pembayaran secara server-side melalui webhook Mayar dan GET /api/orders/:orderId — kehadiran orderId di URL bukan bukti pembayaran.</p><div className="order-code"><span>Contoh Kode Pesanan</span><strong>WK-PREVIEW-001</strong><button aria-label="Salin kode pesanan"><Copy size={16} /></button></div></section>
-        <div className="status-check-action">
-          <button className="button button--ghost" disabled aria-disabled="true" title="Menunggu endpoint GET /api/orders/:orderId (P8) — belum tersedia."><RefreshCcw size={16} /> Cek Status Pembayaran</button>
+        <div className="status-title">
+          <p className="eyebrow">Status pesanan Anda</p>
+          <h1>Status Pembayaran</h1>
+          <p>Status ini berasal langsung dari verifikasi backend — bukan dari tautan atau redirect.</p>
         </div>
+        <section className={`success-card success-card--${meta.tone}`}>
+          <div className="success-icon"><Icon size={38} /></div>
+          <h2>{meta.title}</h2>
+          <p>
+            {meta.tone === 'pending'
+              ? 'Status final akan diperbarui otomatis setelah backend memverifikasi pembayaran melalui Mayar.'
+              : meta.tone === 'success'
+                ? 'Pesanan Anda telah dikonfirmasi. Detail pesanan akan dikirimkan ke email dan WhatsApp Anda.'
+                : meta.tone === 'warning'
+                  ? 'Batas waktu pembayaran untuk pesanan ini telah berakhir. Silakan lakukan checkout ulang.'
+                  : meta.tone === 'error'
+                    ? 'Pembayaran untuk pesanan ini belum berhasil diverifikasi. Silakan coba lagi atau hubungi dukungan.'
+                    : 'Pesanan ini telah dibatalkan.'}
+          </p>
+          <div className="order-code"><span>Kode Pesanan</span><strong>{data.orderCode}</strong></div>
+        </section>
+
+        {pollingActive ? (
+          <p className="polling-note">Memeriksa status pembayaran secara otomatis setiap 3 detik…</p>
+        ) : (
+          <div className="status-check-action">
+            <button className="button button--ghost" onClick={handleManualCheck} disabled={manualChecking} aria-busy={manualChecking}>
+              <RefreshCcw size={16} /> Cek Status Pembayaran
+            </button>
+          </div>
+        )}
+
         <div className="status-stack">
-          <section className="status-detail-card product-summary-card"><div className="status-product-art"><div className="phone phone--one"><div className="phone__bar" /></div><div className="phone phone--two"><div className="phone__bar" /></div></div><div><p className="eyebrow">Ringkasan Produk (contoh)</p><h2>Template Konten Instagram UMKM</h2><ul><li>100+ template siap pakai</li><li>Desain modern dan editable</li><li>Cocok untuk berbagai jenis usaha</li></ul></div><div className="status-price"><span>Jumlah</span><b>1 Produk</b><span>Harga</span><strong>{formatIdr(49000)}</strong></div></section>
-          <section className="status-detail-card customer-card"><div><p className="eyebrow">Informasi Pelanggan (contoh)</p><p><Mail size={18} /><span>Email<b>{previewEmail}</b></span></p><p><MessageCircle size={18} /><span>WhatsApp<b>{previewPhone}</b></span></p></div><div className="customer-shield"><ShieldCheck size={46} /></div></section>
-          <section className="status-detail-card transaction-card"><p className="eyebrow">Detail Transaksi (contoh)</p><div><span>Status</span><b className="preview-pill">Menunggu Konfirmasi Pembayaran</b></div><div><span>Metode Pembayaran</span><b>QRIS</b></div><div><span>Waktu Pembayaran</span><b>Belum tersedia</b></div><div><span>Total Pembayaran</span><strong>{formatIdr(49000)}</strong></div></section>
-          <section className="next-steps"><p className="eyebrow">Langkah Selanjutnya</p><div><article><span>1</span><Mail size={26} /><h3>Cek email konfirmasi</h3><p>Detail pesanan dikirimkan ke email Anda setelah pembayaran terverifikasi.</p></article><article><span>2</span><Download size={26} /><h3>Simpan bukti pembayaran</h3><p>Unduh dan simpan bukti setelah status pesanan terkonfirmasi.</p></article><article><span>3</span><Headphones size={26} /><h3>Pesanan diproses</h3><p>Sistem akan memproses pesanan Anda setelah status paid terverifikasi.</p></article></div></section>
+          <section className="status-detail-card product-summary-card">
+            <div className="status-product-art"><div className="phone phone--one"><div className="phone__bar" /></div><div className="phone phone--two"><div className="phone__bar" /></div></div>
+            <div><p className="eyebrow">Ringkasan Produk</p><h2>{data.product.name}</h2></div>
+            <div className="status-price"><span>Jumlah</span><b>1 Produk</b><span>Harga</span><strong>{formatIdr(data.amountIdr)}</strong></div>
+          </section>
+          <section className="status-detail-card customer-card">
+            <div>
+              <p className="eyebrow">Informasi Pelanggan</p>
+              <p><Mail size={18} /><span>Email<b>{data.customer.maskedEmail}</b></span></p>
+              <p><MessageCircle size={18} /><span>WhatsApp<b>{data.customer.maskedPhone}</b></span></p>
+            </div>
+            <div className="customer-shield"><ShieldCheck size={46} /></div>
+          </section>
+          <section className="status-detail-card transaction-card">
+            <p className="eyebrow">Detail Transaksi</p>
+            <div><span>Status</span><b className={`status-pill status-pill--${meta.tone}`}>{meta.title}</b></div>
+            <div><span>Metode Pembayaran</span><b>{data.paymentMethod ?? 'Belum tersedia'}</b></div>
+            <div><span>Waktu Pembayaran</span><b>{data.paidAt ?? 'Belum tersedia'}</b></div>
+            <div><span>Total Pembayaran</span><strong>{formatIdr(data.amountIdr)}</strong></div>
+          </section>
         </div>
-        <div className="status-actions"><Link className="button button--accent" to="/#produk">Lihat Produk Lain</Link><button className="button button--ghost" disabled aria-disabled="true"><Download size={17} /> Unduh Bukti Pembayaran</button></div>
+
+        <div className="status-actions">
+          <Link className="button button--accent" to="/#produk">Lihat Produk Lain</Link>
+          {isPaid ? (
+            // Paid-only placeholder — intentionally always disabled. No real
+            // PDF download is implemented yet; this only communicates that
+            // the feature is coming soon once a transaction is verified paid.
+            <button className="button button--ghost" disabled aria-disabled="true" title="Bukti Pembayaran Segera Hadir">
+              <Download size={17} /> Bukti Pembayaran Segera Hadir
+            </button>
+          ) : (
+            <button className="button button--ghost" disabled aria-disabled="true">
+              <Download size={17} /> Unduh Bukti Pembayaran
+            </button>
+          )}
+        </div>
         <div className="support-banner"><Headphones size={26} /><div><h3>Butuh bantuan?</h3><p>Jika ada pertanyaan atau kendala, tim kami siap membantu Anda.</p></div><a href="mailto:hello@warungkit.id" className="button button--ghost button--small">Hubungi Support</a></div>
       </main>
       <SiteFooter />
