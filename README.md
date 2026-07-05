@@ -2,9 +2,9 @@
 
 A secure digital storefront webinar demo for Indonesian UMKM (small/micro businesses). WarungKit shows how an AI-assisted ("vibe coded") storefront becomes a trustworthy business application once real engineering boundaries are added: a backend API, controlled database access, server-side payment verification, webhook handling, secret management, and security controls.
 
-## Current Status: Foundation and architecture documentation in progress
+## Current Status: Backend API foundation in progress
 
-This repository currently contains the repository scaffold, Claude Code governance layer (Phases P1–P2), and architecture/security documentation (Phase P3) from `docs/PROJECT_CHECKLIST.md`. No application code, no database schema, no Cloudflare/Supabase/Mayar configuration, and **no live payment integration** exist yet.
+This repository currently contains the repository scaffold, Claude Code governance layer (Phases P1–P2), architecture/security documentation (Phase P3), the reviewed database migration baseline (Phase P5-A), and a secure backend API foundation with `/health` and `/api/products` implemented (Phase P6) from `docs/PROJECT_CHECKLIST.md`. Checkout, order-status lookup, and webhook routes exist only as safe `501 NOT_IMPLEMENTED` placeholders. No Cloudflare deployment, no Mayar integration, no frontend application code, and **no live payment integration** exist yet.
 
 ## Documentation Map
 
@@ -33,11 +33,11 @@ The browser only ever talks to the Worker API. The Worker is the sole caller of 
 ```
 apps/
   web/                  React + Vite + TypeScript + Tailwind storefront (not yet scaffolded)
-  api/                  Hono API on Cloudflare Workers (not yet scaffolded)
+  api/                  Hono API on Cloudflare Workers — health, products, and safe 501 placeholders for checkout/orders/webhooks
 packages/
-  contracts/            Shared Zod schemas and TypeScript types (not yet scaffolded)
+  contracts/            Shared Zod schemas and TypeScript types (HealthResponse, Product, ApiError)
 supabase/
-  migrations/           Versioned schema and RLS migrations (not yet created)
+  migrations/           Versioned schema and RLS migrations (core schema baseline created; not yet pushed remotely)
 .claude/
   skills/               Scoped Claude Code skills guiding implementation per feature area
 docs/
@@ -59,9 +59,10 @@ tests/                  Cross-app/integration tests (not yet created)
 
 ## Local Setup Prerequisites
 
-- **Node.js 22 or above is required** (see `engines` in `package.json`) — application scaffolding must not begin until this is confirmed on the local machine.
-- **A working pnpm installation is required** before any application scaffolding (workspace defined in `pnpm-workspace.yaml`).
-- No application dependencies are installed yet — this will happen once `apps/web`, `apps/api`, and `packages/contracts` are scaffolded.
+- **Node.js 22 or above is required** (see `engines` in `package.json`).
+- **pnpm 10 or above is required** (workspace defined in `pnpm-workspace.yaml`; run `pnpm install` from the repo root).
+- Copy `apps/api/.dev.vars.example` to `apps/api/.dev.vars` for local development and fill in real values there — never commit `.dev.vars`.
+- `apps/web` is not yet scaffolded; its dependencies will be added in a later phase.
 
 ## Security Note
 
@@ -78,8 +79,8 @@ This repository follows the phased plan in `docs/PROJECT_CHECKLIST.md`:
 - **P2** Claude Code Governance and Skills *(this setup)*
 - **P3** Architecture and Security Documentation *(this setup)*
 - **P4** Cloudflare, Supabase, and Mayar Environment Setup
-- **P5** Database Schema, RLS, and Seed Data
-- **P6** Backend API Foundation
+- **P5** Database Schema, RLS, and Seed Data *(migration + seed reviewed locally; not yet pushed remotely)*
+- **P6** Backend API Foundation *(health + products implemented; checkout/orders/webhooks are 501 placeholders)*
 - **P7** Frontend Storefront and Checkout Experience
 - **P8** Mayar Payment and Webhook Integration
 - **P9** Security, Testing, and Observability
@@ -88,7 +89,7 @@ This repository follows the phased plan in `docs/PROJECT_CHECKLIST.md`:
 
 ## Root Scripts
 
-The root `package.json` currently contains **placeholder scripts only** (`lint`, `typecheck`, `test`, `build`) that print a notice instead of calling packages that do not exist yet. These will be completed to call `pnpm -r <script>` once `apps/web`, `apps/api`, and `packages/contracts` are scaffolded in later phases.
+The root `package.json` now runs real workspace scripts: `dev:api`, `lint`, `typecheck`, `test`, and `build` all delegate to `pnpm -r --if-present <script>`, so they work today across `apps/api` and `packages/contracts` and will pick up `apps/web` automatically once it is scaffolded (no root script changes needed later). `format` and `format:check` run Prettier across the whole repo.
 
 ## No Live Payment Integration
 

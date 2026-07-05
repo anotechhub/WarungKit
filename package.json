@@ -9,11 +9,19 @@
   },
   "packageManager": "pnpm@10.34.4",
   "scripts": {
-    "lint": "echo \"lint: no lintable packages yet — will run pnpm -r lint once apps/packages are scaffolded\"",
-    "typecheck": "echo \"typecheck: no TypeScript projects yet — will run pnpm -r typecheck once apps/packages are scaffolded\"",
-    "test": "echo \"test: no test suites yet — will run pnpm -r test once apps/packages are scaffolded\"",
-    "build": "echo \"build: no buildable packages yet — will run pnpm -r build once apps/packages are scaffolded\"",
-    "format": "prettier --check .",
-    "format:write": "prettier --write ."
+    "dev:api": "pnpm --filter @warungkit/api dev",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "build": "pnpm -r --if-present build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.4",
+    "typescript-eslint": "^8.62.1"
   }
 }
