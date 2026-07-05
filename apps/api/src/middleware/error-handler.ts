@@ -16,7 +16,7 @@ export const errorHandler: ErrorHandler<{
 
   if (err instanceof ApiError) {
     return c.json(buildApiErrorResponse(err.code, err.message, requestId), {
-      status: err.status as 400 | 404 | 500 | 501 | 503,
+      status: err.status as 400 | 401 | 403 | 404 | 409 | 422 | 500 | 501 | 502 | 503,
     });
   }
 

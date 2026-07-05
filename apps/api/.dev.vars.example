@@ -1,5 +1,6 @@
 ENVIRONMENT=development
 ALLOWED_ORIGINS=http://localhost:5173
+FRONTEND_BASE_URL=https://warungkit-demo.pages.dev
 SUPABASE_URL=
 SUPABASE_SECRET_KEY=
 MAYAR_API_KEY=

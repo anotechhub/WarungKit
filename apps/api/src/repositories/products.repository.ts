@@ -3,6 +3,7 @@ import type { Product } from "@warungkit/contracts";
 
 export interface ProductsRepository {
   listActiveProducts(): Promise<Product[]>;
+  findActiveProductById(productId: string): Promise<Product | null>;
 }
 
 // All database access for products lives here. Services/routes must never
@@ -24,6 +25,21 @@ export function createProductsRepository(client: SupabaseClient): ProductsReposi
       }
 
       return (data ?? []) as Product[];
+    },
+
+    async findActiveProductById(productId: string): Promise<Product | null> {
+      const { data, error } = await client
+        .from("products")
+        .select("id, slug, name, description, price_idr, product_type, sort_order")
+        .eq("id", productId)
+        .eq("is_active", true)
+        .maybeSingle();
+
+      if (error) {
+        throw new Error("products_repository_query_failed");
+      }
+
+      return (data as Product | null) ?? null;
     },
   };
 }

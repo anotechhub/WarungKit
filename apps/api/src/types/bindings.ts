@@ -8,6 +8,7 @@
 export interface CloudflareBindings {
   ENVIRONMENT?: string;
   ALLOWED_ORIGINS?: string;
+  FRONTEND_BASE_URL?: string;
   SUPABASE_URL?: string;
   SUPABASE_SECRET_KEY?: string;
   MAYAR_API_KEY?: string;
