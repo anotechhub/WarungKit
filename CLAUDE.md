@@ -20,7 +20,7 @@ This is a demo-first project for a live 60-minute webinar — optimize for relia
 - Use strict TypeScript everywhere. No `any` unless explicitly justified in a comment and reviewed.
 - Never place secrets in code, logs, screenshots, documentation, or Git — no exceptions.
 - The browser must never call Mayar directly.
-- The browser must never receive the Mayar API key or the Supabase service role key.
+- The browser must never receive the Mayar API key or the Supabase secret key (`SUPABASE_SECRET_KEY`).
 - The browser must never directly access sensitive order tables (orders, payment events, idempotency records).
 - Product prices must always be resolved from the database by the backend — never trust a browser-submitted price.
 - A payment redirect is a UX event only — it is never proof of payment.

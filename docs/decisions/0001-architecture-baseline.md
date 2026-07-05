@@ -34,6 +34,8 @@ WarungKit dibangun dengan arsitektur berikut:
 
 Model kepercayaan inti: **browser hanya mengirim niat (intent), backend memutuskan kebenaran (truth), database mencatat kebenaran, dan status pembayaran hanya berubah setelah verifikasi server-side terhadap Mayar.**
 
+**Catatan kompatibilitas penamaan Supabase:** BRD PDF mungkin menyebut kredensial backend Supabase dengan istilah lama "service role key". Standar implementasi WarungKit menggunakan `SUPABASE_SECRET_KEY` (format Supabase secret key terkini) untuk variabel yang sama — hanya backend-only, hanya tersimpan di Cloudflare Worker secret, tidak pernah terekspos ke browser.
+
 ## Architecture Diagram
 
 ```mermaid
@@ -59,7 +61,7 @@ Catatan alur: jalur atas (A→B→C→D, C→E→F) adalah alur checkout dan pem
 | Customer Browser | Menampilkan katalog, mengumpulkan data checkout, memulai proses checkout, membaca/polling status pembayaran. Tidak pernah memegang kebenaran bisnis (harga, status paid, kredensial). |
 | Cloudflare Pages | Meng-hosting artefak frontend statis dan menjadi titik masuk publik untuk browser. |
 | Cloudflare Worker API | Memvalidasi request, meresolusi harga produk dari database, membuat order, memanggil Mayar, memproses webhook, memverifikasi status, memperbarui order, menerapkan CORS, request ID, dan error yang aman. |
-| Supabase PostgreSQL | Menyimpan produk, order, metadata payment event, dan idempotency record. RLS aktif; akses service role hanya dari Worker. |
+| Supabase PostgreSQL | Menyimpan produk, order, metadata payment event, dan idempotency record. RLS aktif; akses backend penuh (`SUPABASE_SECRET_KEY`) hanya dari Worker. |
 | Mayar | Meng-hosting halaman pembayaran, menerima pembayaran, dan mengirim event/identifier pembayaran yang digunakan untuk verifikasi server-side. |
 | Claude Code | Mempercepat perencanaan dan implementasi, tetapi tidak menggantikan review, testing, atau tanggung jawab keamanan manusia. |
 
@@ -69,7 +71,7 @@ Catatan alur: jalur atas (A→B→C→D, C→E→F) adalah alur checkout dan pem
 |---|---|
 | Zona tidak tepercaya (untrusted) | Browser pelanggan, penyimpanan browser, data form masuk, parameter redirect, dan request internet publik apa pun. |
 | Zona API terkontrol | Cloudflare Worker — memvalidasi seluruh input klien dan hanya mengekspos respons yang aman untuk publik. |
-| Zona data terproteksi | Akses service Supabase, kunci pembayaran, dan logic mutasi order. |
+| Zona data terproteksi | Akses backend Supabase (`SUPABASE_SECRET_KEY`), kunci pembayaran, dan logic mutasi order. |
 | Zona provider eksternal | Respons dan payload webhook Mayar dianggap input eksternal tidak tepercaya sampai diverifikasi. |
 
 ## Primary Payment Flow

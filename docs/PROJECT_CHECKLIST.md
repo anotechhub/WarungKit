@@ -15,7 +15,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 - [ ] Frontend dapat diakses publik di `warungkit-demo.pages.dev` dan menampilkan katalog 3 produk demo.
 - [ ] Checkout end-to-end berhasil: pilih produk → isi form → order `pending` dibuat di backend → link pembayaran Mayar dibuat → redirect ke halaman Mayar.
 - [ ] Webhook Mayar diterima di backend, diverifikasi server-side, dan status order berubah dari `pending`/`payment_created` menjadi `paid` — tanpa pernah mempercayai redirect browser sebagai bukti pembayaran.
-- [ ] Tidak ada API key Mayar atau Supabase service role key yang muncul di kode frontend, bundle browser, network request, riwayat git, atau tangkapan layar.
+- [ ] Tidak ada API key Mayar atau Supabase secret key (`SUPABASE_SECRET_KEY`) yang muncul di kode frontend, bundle browser, network request, riwayat git, atau tangkapan layar.
 - [ ] RLS aktif di seluruh tabel Supabase; tidak ada policy anonim yang permisif.
 - [ ] Checkout dan pemrosesan webhook bersifat idempotent (duplikat tidak menghasilkan order ganda atau transisi status ganda).
 - [ ] Seluruh command kualitas (`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`) lulus tanpa error.
@@ -36,7 +36,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 - Setiap keputusan desain harus menjawab: "Apakah ini membuat demo 60 menit lebih andal atau lebih berisiko?"
 
 ### Security by Default
-- Rahasia (Mayar API key, Supabase service role key) **hanya** hidup di Cloudflare Worker secret/config — tidak pernah di frontend, git, atau log.
+- Rahasia (Mayar API key, Supabase secret key `SUPABASE_SECRET_KEY`) **hanya** hidup di Cloudflare Worker secret/config — tidak pernah di frontend, git, atau log.
 - Setiap input dari klien dianggap tidak tepercaya (untrusted) sampai divalidasi ulang di backend.
 - Harga selalu diambil dari database (`products.price_idr`), tidak pernah dari body request klien.
 - Status "paid" hanya boleh diset oleh backend setelah verifikasi server-side terhadap Mayar — redirect browser bukan bukti pembayaran.
@@ -68,7 +68,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 | P1. Repository and Git Foundation | Membangun monorepo pnpm dan struktur baseline | Skeleton repo, `.gitignore`, `pnpm-workspace.yaml` | P0 | Must Have | Tinggi | Not Started |
 | P2. Claude Code Governance and Skills | Menyiapkan CLAUDE.md dan skill terskop | `.claude/skills/*`, `CLAUDE.md` | P1 | Must Have | Sedang | Not Started |
 | P3. Architecture and Security Documentation | Mendokumentasikan arsitektur, threat model, dan keputusan | `docs/decisions/*`, `docs/runbooks/*` | P1 | Must Have | Sedang | Not Started |
-| P4. Cloudflare, Supabase, and Mayar Environment Setup | Menyiapkan akun, project, dan kredensial sandbox | Project Cloudflare Pages/Workers, project Supabase, akun Mayar sandbox | P1 | Must Have | Tinggi | Not Started |
+| P4. Cloudflare, Supabase, and Mayar Environment Setup | Menyiapkan akun, penamaan project, dan kredensial sandbox | Reservasi nama/URL Cloudflare Pages, project Cloudflare Workers, project Supabase, akun Mayar sandbox | P1 | Must Have | Tinggi | Not Started |
 | P5. Database Schema, RLS, and Seed Data | Membuat skema tabel inti, RLS, dan data produk demo | Migration files, `seed.sql` | P4 | Must Have | Tinggi | Not Started |
 | P6. Backend API Foundation | Membangun Hono API dengan validasi dan repository layer | Endpoint `/health`, `/api/products`, struktur service | P5 | Must Have | Tinggi | Not Started |
 | P7. Frontend Storefront and Checkout Experience | Membangun katalog dan form checkout | Halaman katalog dan checkout React | P6 | Must Have | Tinggi | Not Started |
@@ -235,13 +235,13 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 ### P4. Cloudflare, Supabase, and Mayar Environment Setup
 
-- [ ] [Must Have] Buat project Cloudflare Pages dengan nama stabil menuju `warungkit-demo.pages.dev`
-  - Why it matters: URL publik frontend harus stabil dan tidak berubah mendekati hari-H (R-07).
+- [ ] [Must Have] Konfirmasi ketersediaan nama project Cloudflare Pages `warungkit-demo` dan kunci penamaan URL publik `warungkit-demo.pages.dev`
+  - Why it matters: Nama dan URL publik frontend harus dikunci sejak awal agar tidak berubah mendekati hari-H (R-07), tanpa perlu membuat dan men-deploy project Pages kosong sebelum `apps/web` benar-benar ada.
   - Claude Skill: —
   - Dependency: Akun Cloudflare tersedia.
-  - Output / Evidence: Project Cloudflare Pages aktif dengan URL dikonfirmasi dapat diakses.
-  - Acceptance criteria: URL `warungkit-demo.pages.dev` merespons (walau masih placeholder) sebelum P7 selesai.
-  - Risk if skipped: Perubahan URL mendekati hari-H merusak konfigurasi CORS dan webhook.
+  - Output / Evidence: Konfirmasi bahwa nama `warungkit-demo` tersedia di Cloudflare Pages; catatan bahwa pembuatan project Pages sesungguhnya, koneksi GitHub, konfigurasi build, environment variable, dan deployment publik baru dilakukan di P10 setelah `apps/web` ada dan lulus validasi build.
+  - Acceptance criteria: Nama project `warungkit-demo` dan URL `warungkit-demo.pages.dev` tercatat sebagai target final sebelum P7 selesai — tidak ada project Pages kosong yang dibuat/dideploy di tahap ini.
+  - Risk if skipped: Perubahan nama/URL mendekati hari-H merusak konfigurasi CORS dan webhook.
 
 - [ ] [Must Have] Buat/reservasi project Cloudflare Workers dengan nama stabil menuju `warungkit-api.<cloudflare-subdomain>.workers.dev`
   - Why it matters: URL publik backend harus stabil karena menjadi endpoint webhook Mayar; reservasi nama project dilakukan lebih awal agar tidak berubah mendekati hari-H, terlepas dari kapan endpoint diimplementasikan.
@@ -251,12 +251,12 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Nama project Worker dan URL publiknya terkonfirmasi dan terdokumentasi untuk digunakan pada deployment (P10) dan registrasi webhook Mayar (P8) di kemudian hari. Implementasi dan validasi `GET /health` yang benar-benar merespons tidak menjadi syarat penyelesaian tahap ini — itu adalah tugas P6 (implementasi) dan P10 (validasi publik).
   - Risk if skipped: Webhook Mayar tidak dapat didaftarkan ke URL yang stabil.
 
-- [ ] [Must Have] Buat project Supabase; simpan `SUPABASE_SERVICE_ROLE_KEY` sebagai Worker secret dan `SUPABASE_URL` sebagai Worker configuration variable backend-only
-  - Why it matters: Service role key adalah rahasia paling sensitif dalam proyek ini — tidak boleh bocor ke browser. `SUPABASE_URL` bukan rahasia, tetapi tetap backend-only dan tidak boleh di-commit dengan nilai produksi.
+- [ ] [Must Have] Buat project Supabase; simpan `SUPABASE_SECRET_KEY` sebagai Worker secret dan `SUPABASE_URL` sebagai Worker configuration variable backend-only
+  - Why it matters: `SUPABASE_SECRET_KEY` adalah rahasia paling sensitif dalam proyek ini — tidak boleh bocor ke browser. `SUPABASE_URL` bukan rahasia, tetapi tetap backend-only dan tidak boleh di-commit dengan nilai produksi. (BRD PDF mungkin menyebut kredensial ini dengan istilah lama "service role key" — standar implementasi WarungKit menggunakan `SUPABASE_SECRET_KEY`.)
   - Claude Skill: database-engineering, security-review
   - Dependency: Akun Supabase tersedia.
-  - Output / Evidence: Project Supabase aktif; `SUPABASE_SERVICE_ROLE_KEY` tersimpan via `wrangler secret put`, `SUPABASE_URL` tersimpan sebagai konfigurasi Worker.
-  - Acceptance criteria: `SUPABASE_SERVICE_ROLE_KEY` tidak muncul di kode, `.env.example`, atau frontend build; `SUPABASE_URL` tidak muncul di frontend build.
+  - Output / Evidence: Project Supabase aktif; `SUPABASE_SECRET_KEY` tersimpan via `wrangler secret put`, `SUPABASE_URL` tersimpan sebagai konfigurasi Worker.
+  - Acceptance criteria: `SUPABASE_SECRET_KEY` tidak muncul di kode, `.env.example`, atau frontend build; `SUPABASE_URL` tidak muncul di frontend build.
   - Risk if skipped: Kebocoran akses penuh ke database (SC-01).
 
 - [ ] [Must Have] Buat akun Mayar sandbox/test dan simpan `MAYAR_API_KEY` hanya di Worker secret
@@ -275,11 +275,11 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Test call manual (curl/Postman) berhasil membuat invoice test dan membaca statusnya.
   - Risk if skipped: Kegagalan integrasi baru diketahui saat implementasi P8, mepet H-3 hari.
 
-- [ ] [Should Have] Tentukan `ALLOWED_ORIGINS` awal mengarah ke URL Cloudflare Pages demo
-  - Why it matters: CORS harus dikunci sejak awal, bukan ditambal di akhir (SC-06).
+- [ ] [Should Have] Tentukan `ALLOWED_ORIGINS` awal mengarah ke penamaan URL Cloudflare Pages demo yang sudah dikunci (`warungkit-demo.pages.dev`)
+  - Why it matters: CORS harus dikunci sejak awal, bukan ditambal di akhir (SC-06) — nilai awal ini bisa ditentukan dari penamaan URL yang dikunci di P4, meskipun project Pages sesungguhnya baru dibuat di P10.
   - Claude Skill: security-review, backend-api
-  - Dependency: URL Cloudflare Pages P4 selesai.
-  - Output / Evidence: Nilai `ALLOWED_ORIGINS` dicatat untuk digunakan di Worker config P6.
+  - Dependency: Penamaan URL Cloudflare Pages dikunci di P4.
+  - Output / Evidence: Nilai `ALLOWED_ORIGINS` dicatat untuk digunakan di Worker config P6, dan dikonfirmasi ulang sebagai final di P10 setelah deployment Pages sesungguhnya.
   - Acceptance criteria: Tidak ada wildcard (`*`) digunakan sebagai origin.
   - Risk if skipped: CORS permisif menjadi celah keamanan (Threat: Misconfigured CORS).
 
@@ -524,7 +524,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Claude Skill: security-review
   - Dependency: Seluruh kode P1-P8 selesai.
   - Output / Evidence: Laporan hasil scan (mis. `git log -p | grep` terarah atau tool scanning).
-  - Acceptance criteria: Tidak ditemukan pola API key/service role key di riwayat commit.
+  - Acceptance criteria: Tidak ditemukan pola API key/`SUPABASE_SECRET_KEY` di riwayat commit.
   - Risk if skipped: Rahasia bocor permanen meski sudah "diperbaiki" di commit terbaru.
 
 - [ ] [Must Have] Tulis unit test untuk skema Zod, resolusi harga, helper idempotency, dan transisi status order
@@ -585,12 +585,12 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 ### P10. Cloudflare Deployment and End-to-End Validation
 
-- [ ] [Must Have] Deploy `apps/web` ke Cloudflare Pages di URL `warungkit-demo.pages.dev`
-  - Why it matters: Frontend publik yang stabil dibutuhkan untuk rehearsal dan live demo.
+- [ ] [Must Have] Buat/hubungkan project Cloudflare Pages `warungkit-demo`, hubungkan repository GitHub yang sesuai, konfigurasi build command dan output directory, lalu deploy `apps/web` publik ke `warungkit-demo.pages.dev`
+  - Why it matters: Frontend publik yang stabil dibutuhkan untuk rehearsal dan live demo; pembuatan project Pages baru dilakukan di sini (bukan di P4) karena `apps/web` sudah ada dan lulus validasi build, sehingga tidak ada project Pages kosong yang perlu di-maintain lebih awal.
   - Claude Skill: —
-  - Dependency: P7 frontend selesai dan lulus build.
-  - Output / Evidence: URL dapat diakses publik dan menampilkan katalog nyata.
-  - Acceptance criteria: Deployment berhasil tanpa error build, halaman termuat sempurna.
+  - Dependency: P7 frontend selesai dan lulus build; nama project `warungkit-demo` sudah dikonfirmasi tersedia di P4.
+  - Output / Evidence: Project Cloudflare Pages `warungkit-demo` aktif, terhubung ke repository/workflow deployment yang disetujui, build command dan output directory terkonfigurasi benar; URL dapat diakses publik dan menampilkan katalog nyata.
+  - Acceptance criteria: Deployment berhasil tanpa error build; halaman termuat sempurna di `warungkit-demo.pages.dev`; alur storefront dan checkout tervalidasi dari URL Pages publik; URL Pages final dikonfirmasi digunakan di `ALLOWED_ORIGINS` Worker.
   - Risk if skipped: Tidak ada versi publik untuk direhearsalkan.
 
 - [ ] [Must Have] Deploy `apps/api` ke Cloudflare Workers di URL `warungkit-api.<cloudflare-subdomain>.workers.dev`
@@ -601,7 +601,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Seluruh endpoint (`/api/products`, `/api/checkout`, `/api/orders/:orderId`, `/api/webhooks/mayar`) dapat diakses dari URL publik.
   - Risk if skipped: Webhook dan checkout tidak dapat diuji dalam kondisi nyata.
 
-- [ ] [Must Have] Set Worker secret (`MAYAR_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) via `wrangler secret put`, dan Worker configuration variables (`MAYAR_API_BASE_URL`, `SUPABASE_URL`, `ALLOWED_ORIGINS`, `ENVIRONMENT`) sebagai konfigurasi backend-only — tidak ada nilai produksi dari kedua kelompok ini yang ter-commit
+- [ ] [Must Have] Set Worker secret (`MAYAR_API_KEY`, `SUPABASE_SECRET_KEY`) via `wrangler secret put`, dan Worker configuration variables (`MAYAR_API_BASE_URL`, `SUPABASE_URL`, `ALLOWED_ORIGINS`, `ENVIRONMENT`) sebagai konfigurasi backend-only — tidak ada nilai produksi dari kedua kelompok ini yang ter-commit
   - Why it matters: Non-negotiable — kredensial rahasia hanya boleh ada di secret store Cloudflare; nilai konfigurasi backend tetap tidak boleh ter-commit meski bukan kredensial.
   - Claude Skill: security-review
   - Dependency: Worker deployment aktif.
@@ -775,7 +775,7 @@ warungkit/
 Ini adalah kredensial sensitif dan hanya boleh disimpan melalui mekanisme secret Cloudflare Worker (mis. `wrangler secret put`), tidak pernah sebagai variabel konfigurasi biasa:
 
 - [ ] `MAYAR_API_KEY`
-- [ ] `SUPABASE_SERVICE_ROLE_KEY`
+- [ ] `SUPABASE_SECRET_KEY` *(catatan kompatibilitas: BRD PDF mungkin menyebut kredensial ini dengan istilah lama "service role key" — standar implementasi WarungKit menggunakan `SUPABASE_SECRET_KEY`, format Supabase secret key terkini)*
 
 ### Cloudflare Worker Configuration Variables
 
@@ -958,7 +958,7 @@ Nilai ini boleh tersedia di build frontend dan tidak boleh pernah berisi rahasia
 
 - [ ] Cloudflare Pages project untuk `apps/web` dideploy ke `warungkit-demo.pages.dev` dengan nama project stabil.
 - [ ] Cloudflare Workers project untuk `apps/api` dideploy ke `warungkit-api.<cloudflare-subdomain>.workers.dev` dengan nama project stabil.
-- [ ] Worker secret (`MAYAR_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) diset via `wrangler secret put`; Worker configuration variables (`MAYAR_API_BASE_URL`, `SUPABASE_URL`, `ALLOWED_ORIGINS`, `ENVIRONMENT`) diset sebagai konfigurasi backend-only tanpa nilai produksi ter-commit.
+- [ ] Worker secret (`MAYAR_API_KEY`, `SUPABASE_SECRET_KEY`) diset via `wrangler secret put`; Worker configuration variables (`MAYAR_API_BASE_URL`, `SUPABASE_URL`, `ALLOWED_ORIGINS`, `ENVIRONMENT`) diset sebagai konfigurasi backend-only tanpa nilai produksi ter-commit.
 - [ ] Environment variable frontend (`VITE_API_BASE_URL`) diset di dashboard Cloudflare Pages, bukan hardcode di kode.
 - [ ] `ALLOWED_ORIGINS` production dikunci ke URL Cloudflare Pages final sebelum rehearsal.
 - [ ] Nama project Cloudflare (Pages dan Workers) dikunci minimal H-7 hari sebelum webinar, tidak diganti mendekati hari-H.
@@ -1055,5 +1055,5 @@ Item berikut belum terjawab penuh di BRD dan tidak boleh memblokir implementasi 
 1. Konfirmasi kesepakatan tim terhadap seluruh keputusan kunci BRD dan finalisasi 3 produk demo beserta harga (P0).
 2. Inisialisasi repository git dan struktur monorepo pnpm sesuai Section 6 dokumen ini (P1).
 3. Buat `CLAUDE.md` dan seluruh skill `.claude/skills/*` sesuai Section 5 sebelum implementasi kode dimulai (P2).
-4. Siapkan akun dan project Cloudflare Pages, Cloudflare Workers, Supabase, dan Mayar sandbox, lalu kunci nama project publik (P4).
+4. Siapkan akun Cloudflare, Supabase, dan Mayar sandbox; buat/reservasi project Cloudflare Workers dan konfirmasi ketersediaan nama Cloudflare Pages, lalu kunci penamaan project publik (P4) — pembuatan project Pages sesungguhnya menunggu hingga P10.
 5. Mulai implementasi migration database (`products`, `orders`, `payment_events`, `checkout_idempotency`) dengan RLS aktif sejak awal (P5).

@@ -29,7 +29,7 @@ Referensi: `docs/decisions/0001-architecture-baseline.md`, `docs/runbooks/securi
 - **Purpose:** Membuktikan alur keamanan inti — webhook diterima, diverifikasi server-side, dan status order berubah menjadi `paid` tanpa pernah mempercayai redirect browser.
 - **What must already be prepared:** Webhook handler dan verifikasi server-side berfungsi penuh; transisi status ke `paid` sudah teruji; halaman status pembayaran dengan polling 3 detik (maksimum 45 detik) dan tombol manual "Cek Status Pembayaran" sudah berfungsi.
 - **What can be shown live:** Penyelesaian pembayaran di Mayar sandbox, lalu status order berubah dari `pending`/`payment_created` menjadi `paid` — ditunjukkan di halaman status pembayaran dan di dashboard Supabase terkontrol.
-- **What must remain hidden:** `SUPABASE_SERVICE_ROLE_KEY`, tab dashboard Supabase yang menampilkan project settings/API keys, tabel selain yang memang relevan untuk demo (`orders`, `payment_events`).
+- **What must remain hidden:** `SUPABASE_SECRET_KEY`, tab dashboard Supabase yang menampilkan project settings/API keys, tabel selain yang memang relevan untuk demo (`orders`, `payment_events`).
 - **Success proof:** Status "paid" muncul di halaman status DAN di tabel `orders` Supabase secara bersamaan, setelah webhook benar-benar diproses — bukan setelah update manual database. Jika webhook belum masuk dalam 45 detik, operator menekan tombol manual "Cek Status Pembayaran" untuk membuktikan status tetap dapat diverifikasi ulang.
 - **Fallback action:** Tampilkan rekaman video `demo-backup` yang menunjukkan transaksi sukses sebelumnya, sambil menjelaskan alur verifikasi secara naratif menggunakan diagram arsitektur (`docs/decisions/0001-architecture-baseline.md`).
 
@@ -48,7 +48,7 @@ Referensi: `docs/decisions/0001-architecture-baseline.md`, `docs/runbooks/securi
 
 - [ ] Gunakan **profil browser demo khusus**, terpisah dari profil pribadi — tanpa histori, bookmark, atau sesi login pribadi.
 - [ ] Nonaktifkan **seluruh notifikasi pribadi** (email, chat, kalender, OS-level notification) sebelum sesi dimulai.
-- [ ] Pastikan **tidak ada tab berisi secret** terbuka atau ter-preload — tidak ada dashboard yang menampilkan API key, service role key, atau connection string.
+- [ ] Pastikan **tidak ada tab berisi secret** terbuka atau ter-preload — tidak ada dashboard yang menampilkan API key, Supabase secret key, atau connection string.
 - [ ] Hanya buka **tab yang sudah di-preload** sesuai kebutuhan demo: frontend, halaman status pembayaran, dashboard Supabase (view tabel non-sensitif saja), halaman test Mayar sandbox.
 - [ ] Siapkan **hotspot cadangan** (mobile data) sebagai jalur internet kedua jika koneksi utama bermasalah saat live.
 - [ ] Pastikan **rekaman dan screenshot backup** (checkpoint `demo-backup`) sudah disiapkan dan diuji dapat diputar sebelum sesi, bukan disiapkan mendadak saat live.

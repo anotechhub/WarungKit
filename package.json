@@ -5,9 +5,9 @@
   "description": "WarungKit — secure digital storefront webinar demo for Indonesian UMKM.",
   "engines": {
     "node": ">=22.0.0",
-    "pnpm": ">=9.0.0"
+    "pnpm": ">=10.0.0"
   },
-  "packageManager": "pnpm@9.15.0",
+  "packageManager": "pnpm@10.34.4",
   "scripts": {
     "lint": "echo \"lint: no lintable packages yet — will run pnpm -r lint once apps/packages are scaffolded\"",
     "typecheck": "echo \"typecheck: no TypeScript projects yet — will run pnpm -r typecheck once apps/packages are scaffolded\"",

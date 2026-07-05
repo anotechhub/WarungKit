@@ -25,7 +25,7 @@ Build responsive, accessible, on-brand UI for the WarungKit storefront (`apps/we
 - No product, price, or catalog data hardcoded in components — always sourced from the backend API.
 - No generic loud SaaS gradients or templated AI-default aesthetics.
 - Use only the approved palette (charcoal, soft cream, muted terracotta, warm orange) — do not invent a new direction without approval.
-- Never store or display Mayar keys, Supabase service role keys, or full sensitive order data in client state.
+- Never store or display Mayar keys, Supabase secret keys (`SUPABASE_SECRET_KEY`), or full sensitive order data in client state.
 - Form labels, visible error messages, and keyboard focus states are mandatory on every interactive element.
 - A payment status page must never treat a redirect query parameter as proof of payment — status must come from the backend.
 

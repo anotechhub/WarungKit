@@ -58,3 +58,9 @@ Thumbs.db
 # Misc caches
 .cache/
 .eslintcache
+
+# Claude Code local overrides (personal, not team-shared)
+.claude/settings.local.json
+
+# MCP server config (may reference project-specific or personal endpoints)
+.mcp.json

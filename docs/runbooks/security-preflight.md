@@ -10,7 +10,7 @@ Referensi: `CLAUDE.md`, `docs/decisions/0001-architecture-baseline.md`, `docs/de
 
 - [ ] `CLAUDE.md` sudah dibaca dan dipahami oleh siapa pun (manusia atau Claude Code) yang akan menulis kode.
 - [ ] `.gitignore` sudah mengecualikan `.env`, `.env.*`, `.dev.vars`, `.wrangler`, `.supabase`, dan file kredensial lain sebelum baris kode pertama ditulis.
-- [ ] Tidak ada secret di dalam kode sumber — belum ada API key atau service role key yang di-hardcode di mana pun.
+- [ ] Tidak ada secret di dalam kode sumber — belum ada API key atau Supabase secret key (`SUPABASE_SECRET_KEY`) yang di-hardcode di mana pun.
 - [ ] Skill Claude Code yang relevan (`.claude/skills/*/SKILL.md`) sudah diidentifikasi untuk task yang akan dikerjakan.
 
 ## Before Local Testing
@@ -23,7 +23,7 @@ Referensi: `CLAUDE.md`, `docs/decisions/0001-architecture-baseline.md`, `docs/de
 ## Before Public Deployment
 
 - [ ] Tidak ada secret di riwayat Git — secret scanning dijalankan terhadap seluruh riwayat commit, bukan hanya commit terbaru.
-- [ ] Worker secrets (`MAYAR_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) dikonfigurasi via `wrangler secret put`, bukan file konfigurasi ter-commit.
+- [ ] Worker secrets (`MAYAR_API_KEY`, `SUPABASE_SECRET_KEY`) dikonfigurasi via `wrangler secret put`, bukan file konfigurasi ter-commit.
 - [ ] Frontend hanya memiliki `VITE_API_BASE_URL` sebagai environment variable — tidak ada variabel lain yang membocorkan konfigurasi backend/secret.
 - [ ] CORS allowlist (`ALLOWED_ORIGINS`) dikunci ke domain demo final — tidak ada wildcard.
 - [ ] RLS aktif dan direview di seluruh tabel Supabase (`products`, `orders`, `payment_events`, `checkout_idempotency`); tidak ada policy anonim permisif untuk tabel sensitif.
