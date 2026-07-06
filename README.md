@@ -21,6 +21,7 @@ Key correction in P8-A.1: **the Mayar webhook payload is a trigger only, never p
 | `docs/runbooks/security-preflight.md` | Practical security checklist split by project stage (before coding → after webinar), used to catch regressions before each milestone. |
 | `docs/runbooks/demo-operator-baseline.md` | Baseline for the future P11 rehearsal: checkpoint definitions (`demo-start`/`demo-payment`/`demo-final`/`demo-backup`) and presenter hygiene rules. |
 | `docs/api-contract.md` | Endpoint-by-endpoint API contract: request/response shapes, trust boundaries, the Mayar payment flow, and the security guarantees each endpoint enforces. |
+| `docs/runbooks/frontend-pages-deployment.md` | How `apps/web` deploys to Cloudflare Pages via GitHub Actions, why the Cloudflare dashboard "Workers Build" setup is wrong for this frontend, and required secrets/variables. |
 
 ## High-Level Architecture (Target)
 
@@ -96,6 +97,10 @@ This repository follows the phased plan in `docs/PROJECT_CHECKLIST.md`:
 ## Root Scripts
 
 The root `package.json` now runs real workspace scripts: `dev:api`, `lint`, `typecheck`, `test`, and `build` all delegate to `pnpm -r --if-present <script>`, so they work today across `apps/api` and `packages/contracts` and will pick up `apps/web` automatically once it is scaffolded (no root script changes needed later). `format` and `format:check` run Prettier across the whole repo.
+
+## Frontend Deployment (Cloudflare Pages)
+
+`apps/web` deploys to Cloudflare Pages (`warungkit-demo` → `https://warungkit-demo.pages.dev`) via [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) using GitHub Actions + `wrangler pages deploy` (Direct Upload) — **not** the Cloudflare dashboard's Git-connected build. See `docs/runbooks/frontend-pages-deployment.md` for the full explanation, required GitHub Secrets/Variables, and manual setup steps. The backend Worker (`warungkit-api`, `https://warungkit-api.anotechhub.workers.dev`) is deployed and configured separately and is out of scope for this workflow.
 
 ## No Live Payment Integration
 

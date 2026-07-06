@@ -64,17 +64,17 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 | Phase | Objective | Main Deliverable | Dependency | Priority | Demo Impact | Status |
 |---|---|---|---|---|---|---|
-| P0. BRD Review and Scope Lock | Mengunci pemahaman scope, keputusan, dan batasan dari BRD | Ringkasan scope tervalidasi tim (tanpa menduplikasi BRD) | — | Must Have | Tinggi | Not Started |
-| P1. Repository and Git Foundation | Membangun monorepo pnpm dan struktur baseline | Skeleton repo, `.gitignore`, `pnpm-workspace.yaml` | P0 | Must Have | Tinggi | Not Started |
-| P2. Claude Code Governance and Skills | Menyiapkan CLAUDE.md dan skill terskop | `.claude/skills/*`, `CLAUDE.md` | P1 | Must Have | Sedang | Not Started |
-| P3. Architecture and Security Documentation | Mendokumentasikan arsitektur, threat model, dan keputusan | `docs/decisions/*`, `docs/runbooks/*` | P1 | Must Have | Sedang | Not Started |
-| P4. Cloudflare, Supabase, and Mayar Environment Setup | Menyiapkan akun, penamaan project, dan kredensial sandbox | Reservasi nama/URL Cloudflare Pages, project Cloudflare Workers, project Supabase, akun Mayar sandbox | P1 | Must Have | Tinggi | Not Started |
-| P5. Database Schema, RLS, and Seed Data | Membuat skema tabel inti, RLS, dan data produk demo | Migration files, `seed.sql` | P4 | Must Have | Tinggi | Not Started |
-| P6. Backend API Foundation | Membangun Hono API dengan validasi dan repository layer | Endpoint `/health`, `/api/products`, struktur service | P5 | Must Have | Tinggi | Not Started |
-| P7. Frontend Storefront and Checkout Experience | Membangun katalog dan form checkout | Halaman katalog dan checkout React | P6 | Must Have | Tinggi | Not Started |
-| P8. Mayar Payment and Webhook Integration | Mengintegrasikan pembuatan invoice dan penerimaan webhook | Endpoint `/api/checkout`, `/api/webhooks/mayar` | P6, P7 | Must Have | Tinggi | Not Started |
-| P9. Security, Testing, and Observability | Menjalankan uji keamanan, test otomatis, dan logging aman | Test suite, log terstruktur | P8 | Must Have | Sedang | Not Started |
-| P10. Cloudflare Deployment and End-to-End Validation | Deploy ke domain publik dan validasi alur penuh | Deployment live di `warungkit-demo.pages.dev` dan `*.workers.dev` | P9 | Must Have | Tinggi | Not Started |
+| P0. BRD Review and Scope Lock | Mengunci pemahaman scope, keputusan, dan batasan dari BRD | Ringkasan scope tervalidasi tim (tanpa menduplikasi BRD) | — | Must Have | Tinggi | Done |
+| P1. Repository and Git Foundation | Membangun monorepo pnpm dan struktur baseline | Skeleton repo, `.gitignore`, `pnpm-workspace.yaml` | P0 | Must Have | Tinggi | Done |
+| P2. Claude Code Governance and Skills | Menyiapkan CLAUDE.md dan skill terskop | `.claude/skills/*`, `CLAUDE.md` | P1 | Must Have | Sedang | Done |
+| P3. Architecture and Security Documentation | Mendokumentasikan arsitektur, threat model, dan keputusan | `docs/decisions/*`, `docs/runbooks/*` | P1 | Must Have | Sedang | Done |
+| P4. Cloudflare, Supabase, and Mayar Environment Setup | Menyiapkan akun, penamaan project, dan kredensial sandbox | Reservasi nama/URL Cloudflare Pages, project Cloudflare Workers, project Supabase, akun Mayar sandbox | P1 | Must Have | Tinggi | Done |
+| P5. Database Schema, RLS, and Seed Data | Membuat skema tabel inti, RLS, dan data produk demo | Migration files, `seed.sql` | P4 | Must Have | Tinggi | Done |
+| P6. Backend API Foundation | Membangun Hono API dengan validasi dan repository layer | Endpoint `/health`, `/api/products`, struktur service | P5 | Must Have | Tinggi | Done |
+| P7. Frontend Storefront and Checkout Experience | Membangun katalog dan form checkout | Halaman katalog dan checkout React | P6 | Must Have | Tinggi | Done |
+| P8. Mayar Payment and Webhook Integration | Mengintegrasikan pembuatan invoice dan penerimaan webhook | Endpoint `/api/checkout`, `/api/webhooks/mayar` | P6, P7 | Must Have | Tinggi | Done |
+| P9. Security, Testing, and Observability | Menjalankan uji keamanan, test otomatis, dan logging aman | Test suite, log terstruktur | P8 | Must Have | Sedang | Partial (unit/integration test coverage dari P6-P8 sudah ada; secret-scan riwayat git dan dependency audit penuh belum dijalankan) |
+| P10. Cloudflare Deployment and End-to-End Validation | Deploy ke domain publik dan validasi alur penuh | Deployment live di `warungkit-demo.pages.dev` dan `*.workers.dev` | P9 | Must Have | Tinggi | In Progress (frontend build config Cloudflare Pages sedang diperbaiki; backend Worker deploy dan Mayar/Supabase secret belum dikerjakan) |
 | P11. Webinar Rehearsal, Fallback, and Live Demo Readiness | Melatih alur demo dan menyiapkan fallback | Rekaman/screenshot backup, run sheet final | P10 | Must Have | Tinggi | Not Started |
 
 ---
@@ -83,7 +83,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 ### P0. BRD Review and Scope Lock
 
-- [ ] [Must Have] Validasi seluruh keputusan kunci BRD (produk, frontend, backend, database, payment, environment, workflow) disepakati tim
+- [x] [Must Have] Validasi seluruh keputusan kunci BRD (produk, frontend, backend, database, payment, environment, workflow) disepakati tim
   - Why it matters: Mencegah scope creep dan interpretasi berbeda sebelum coding dimulai.
   - Claude Skill: —
   - Dependency: BRD v1.0 tersedia dan telah dibaca penuh.
@@ -91,7 +91,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Semua anggota tim menyatakan pemahaman yang sama terhadap 3 produk demo, alur checkout, dan batasan non-negotiable.
   - Risk if skipped: Implementasi menyimpang dari BRD, menyebabkan rework mendekati hari-H.
 
-- [ ] [Must Have] Konfirmasi 3 produk demo dan harga tetap (Rp49.000 / Rp79.000 / Rp149.000)
+- [x] [Must Have] Konfirmasi 3 produk demo dan harga tetap (Rp49.000 / Rp79.000 / Rp149.000)
   - Why it matters: Produk dan harga adalah data yang akan di-seed ke database dan ditampilkan live.
   - Claude Skill: —
   - Dependency: P0 kesepakatan scope.
@@ -99,7 +99,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Nama, deskripsi singkat, harga, dan tipe (digital product/service) untuk ketiga produk sudah final.
   - Risk if skipped: Perubahan data produk mendadak dekat hari-H mengganggu rehearsal.
 
-- [ ] [Should Have] Tentukan jawaban untuk Open Questions tersisa (Q-01, Q-03, Q-05, Q-06) dari BRD Section 13.3
+- [x] [Should Have] Tentukan jawaban untuk Open Questions tersisa (Q-01, Q-03, Q-05, Q-06) dari BRD Section 13.3
   - Why it matters: Beberapa keputusan (metode pembayaran sandbox, retensi data, nama project final) memengaruhi desain teknis P6-P9. Q-02 (mekanisme status page) dan Q-04 (visibilitas admin) sudah final — lihat Section 17.
   - Claude Skill: —
   - Dependency: Akses ke dashboard Mayar sandbox (P4).
@@ -109,7 +109,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 ### P1. Repository and Git Foundation
 
-- [ ] [Must Have] Inisialisasi git repository dan `.gitignore` yang mencakup `.env`, `.dev.vars`, `node_modules`, build artifacts
+- [x] [Must Have] Inisialisasi git repository dan `.gitignore` yang mencakup `.env`, `.dev.vars`, `node_modules`, build artifacts
   - Why it matters: Mencegah rahasia atau file besar ter-commit sejak awal.
   - Claude Skill: backend-api (untuk konvensi struktur) / manual setup
   - Dependency: —
@@ -117,7 +117,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: `git log` menunjukkan tidak ada commit yang menyertakan file `.env*`.
   - Risk if skipped: Kebocoran rahasia permanen di riwayat git (SC-01, BR-08).
 
-- [ ] [Must Have] Buat struktur monorepo pnpm sesuai Section 6 dokumen ini (`apps/web`, `apps/api`, `packages/contracts`, dst.)
+- [x] [Must Have] Buat struktur monorepo pnpm sesuai Section 6 dokumen ini (`apps/web`, `apps/api`, `packages/contracts`, dst.)
   - Why it matters: Struktur ini menjadi fondasi seluruh pekerjaan berikutnya dan memisahkan tanggung jawab frontend/backend/kontrak.
   - Claude Skill: backend-api, frontend-design
   - Dependency: Git repo diinisialisasi.
@@ -125,7 +125,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: `pnpm install` berjalan tanpa error dari root.
   - Risk if skipped: Struktur berantakan menyulitkan Claude Code bekerja dengan scope yang jelas.
 
-- [ ] [Should Have] Setup `.github/workflows/` untuk CI dasar (lint, typecheck, test, build) tanpa auto-deploy
+- [x] [Should Have] Setup `.github/workflows/` untuk CI dasar (lint, typecheck, test, build) tanpa auto-deploy
   - Why it matters: BRD eksplisit menyatakan CI hanya untuk validasi, bukan deploy otomatis sampai demo tervalidasi manual.
   - Claude Skill: testing-qa
   - Dependency: Struktur monorepo P1 selesai.
@@ -133,7 +133,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: CI berjalan hijau di setiap push/PR.
   - Risk if skipped: Regresi tidak terdeteksi otomatis sebelum rehearsal.
 
-- [ ] [Must Have] Buat `.env.example` tanpa nilai rahasia apa pun
+- [x] [Must Have] Buat `.env.example` tanpa nilai rahasia apa pun
   - Why it matters: Memberi template variabel lingkungan tanpa risiko commit rahasia.
   - Claude Skill: security-review
   - Dependency: Daftar environment variable dari Section 7 dokumen ini.
@@ -143,7 +143,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 ### P2. Claude Code Governance and Skills
 
-- [ ] [Must Have] Buat `CLAUDE.md` proyek berisi aturan non-negotiable dari BRD Section 10.4
+- [x] [Must Have] Buat `CLAUDE.md` proyek berisi aturan non-negotiable dari BRD Section 10.4
   - Why it matters: Menjadi kontrak permanen yang membatasi perilaku Claude Code selama proyek berjalan.
   - Claude Skill: —
   - Dependency: P1 struktur repo.
@@ -151,7 +151,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Memuat larangan `any`, larangan rahasia di source, kewajiban migration untuk skema, kewajiban repository layer, kewajiban validasi input, larangan set status paid dari redirect, kewajiban idempotent webhook, kewajiban lint/typecheck/test/build sebelum selesai.
   - Risk if skipped: Claude Code dapat mengambil jalan pintas tidak aman (R-05 pada Risk Register BRD).
 
-- [ ] [Must Have] Buat skill `.claude/skills/frontend-design/SKILL.md`
+- [x] [Must Have] Buat skill `.claude/skills/frontend-design/SKILL.md`
   - Why it matters: Mengarahkan Claude pada aturan UI responsif, aksesibilitas, dan kualitas frontend yang konsisten.
   - Claude Skill: frontend-design
   - Dependency: CLAUDE.md dibuat.
@@ -159,7 +159,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Skill mencakup checklist aksesibilitas dasar sesuai NFR BRD Section 5.2.
   - Risk if skipped: UI tidak konsisten atau tidak accessible saat demo live.
 
-- [ ] [Must Have] Buat skill `.claude/skills/backend-api/SKILL.md`
+- [x] [Must Have] Buat skill `.claude/skills/backend-api/SKILL.md`
   - Why it matters: Menjaga struktur route, validasi, error handling, dan middleware konsisten di seluruh API.
   - Claude Skill: backend-api
   - Dependency: CLAUDE.md dibuat.
@@ -167,7 +167,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Skill mencakup pola validasi Zod dan pemisahan service/repository layer.
   - Risk if skipped: API dibangun tanpa boundary keamanan yang konsisten.
 
-- [ ] [Must Have] Buat skill `.claude/skills/database-engineering/SKILL.md`
+- [x] [Must Have] Buat skill `.claude/skills/database-engineering/SKILL.md`
   - Why it matters: Menjaga disiplin migration-first dan RLS sejak awal skema dibuat.
   - Claude Skill: database-engineering
   - Dependency: CLAUDE.md dibuat.
@@ -175,7 +175,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Skill eksplisit melarang perubahan skema tanpa migration file.
   - Risk if skipped: Skema database drift dari migration, RLS lupa diaktifkan.
 
-- [ ] [Must Have] Buat skill `.claude/skills/payment-integration/SKILL.md`
+- [x] [Must Have] Buat skill `.claude/skills/payment-integration/SKILL.md`
   - Why it matters: Mengunci pola adapter Mayar, idempotency, dan verifikasi webhook agar tidak diimplementasikan sembarangan oleh AI.
   - Claude Skill: payment-integration
   - Dependency: CLAUDE.md dibuat.
@@ -183,7 +183,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Skill eksplisit melarang set status "paid" tanpa verifikasi server-side.
   - Risk if skipped: Risiko terbesar proyek — payment security gagal (BR-05, BR-06, SC-05).
 
-- [ ] [Must Have] Buat skill `.claude/skills/security-review/SKILL.md`
+- [x] [Must Have] Buat skill `.claude/skills/security-review/SKILL.md`
   - Why it matters: Menjadi checklist standar sebelum setiap fitur sensitif dianggap selesai.
   - Claude Skill: security-review
   - Dependency: CLAUDE.md dibuat.
@@ -191,7 +191,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Skill mencakup seluruh item checklist keamanan demo dari BRD.
   - Risk if skipped: Item keamanan kritikal terlewat sebelum go-live webinar.
 
-- [ ] [Must Have] Buat skill `.claude/skills/testing-qa/SKILL.md`
+- [x] [Must Have] Buat skill `.claude/skills/testing-qa/SKILL.md`
   - Why it matters: Menstandarkan lapisan test (unit, API, webhook, manual smoke) agar konsisten dieksekusi Claude.
   - Claude Skill: testing-qa
   - Dependency: CLAUDE.md dibuat.
@@ -199,7 +199,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Skill mencakup unit test, API integration test, webhook test, dan manual smoke test.
   - Risk if skipped: Test coverage tidak konsisten, bug lolos ke rehearsal.
 
-- [ ] [Must Have] Buat skill `.claude/skills/demo-runbook/SKILL.md`
+- [x] [Must Have] Buat skill `.claude/skills/demo-runbook/SKILL.md`
   - Why it matters: Menstandarkan checkpoint branch, langkah rehearsal, dan keamanan screen-sharing.
   - Claude Skill: demo-runbook
   - Dependency: CLAUDE.md dibuat.
@@ -209,7 +209,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 ### P3. Architecture and Security Documentation
 
-- [ ] [Must Have] Buat Architecture Decision Record awal di `docs/decisions/`
+- [x] [Must Have] Buat Architecture Decision Record awal di `docs/decisions/`
   - Why it matters: Mencatat keputusan arsitektur (Cloudflare, Supabase, Mayar, monorepo) agar tidak diubah tanpa alasan jelas mendekati hari-H.
   - Claude Skill: —
   - Dependency: P0 scope lock.
@@ -217,7 +217,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: ADR mencakup komponen dari BRD Section 6.2 (Customer Browser, Cloudflare Pages, Worker API, Supabase, Mayar, Claude Code).
   - Risk if skipped: Keputusan arsitektur diinterpretasikan ulang secara tidak konsisten oleh anggota tim berbeda.
 
-- [ ] [Must Have] Buat runbook keamanan di `docs/runbooks/`
+- [x] [Must Have] Buat runbook keamanan di `docs/runbooks/`
   - Why it matters: Menjadi rujukan cepat saat rehearsal dan live demo untuk memverifikasi tidak ada kebocoran rahasia.
   - Claude Skill: security-review
   - Dependency: Skill security-review (P2) selesai.
@@ -225,7 +225,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Mencakup seluruh item BRD Section 8.3 (Security checklist for live demo).
   - Risk if skipped: Operator demo lupa memverifikasi item keamanan kritikal sebelum live.
 
-- [ ] [Should Have] Dokumentasikan threat model ringkas berbasis BRD Section 8.2 di `docs/decisions/`
+- [x] [Should Have] Dokumentasikan threat model ringkas berbasis BRD Section 8.2 di `docs/decisions/`
   - Why it matters: Membantu tim memahami mitigasi yang harus diimplementasikan per ancaman (price manipulation, webhook replay, dsb).
   - Claude Skill: security-review
   - Dependency: ADR arsitektur selesai.
@@ -235,7 +235,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 ### P4. Cloudflare, Supabase, and Mayar Environment Setup
 
-- [ ] [Must Have] Konfirmasi ketersediaan nama project Cloudflare Pages `warungkit-demo` dan kunci penamaan URL publik `warungkit-demo.pages.dev`
+- [x] [Must Have] Konfirmasi ketersediaan nama project Cloudflare Pages `warungkit-demo` dan kunci penamaan URL publik `warungkit-demo.pages.dev`
   - Why it matters: Nama dan URL publik frontend harus dikunci sejak awal agar tidak berubah mendekati hari-H (R-07), tanpa perlu membuat dan men-deploy project Pages kosong sebelum `apps/web` benar-benar ada.
   - Claude Skill: —
   - Dependency: Akun Cloudflare tersedia.
@@ -243,7 +243,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Nama project `warungkit-demo` dan URL `warungkit-demo.pages.dev` tercatat sebagai target final sebelum P7 selesai — tidak ada project Pages kosong yang dibuat/dideploy di tahap ini.
   - Risk if skipped: Perubahan nama/URL mendekati hari-H merusak konfigurasi CORS dan webhook.
 
-- [ ] [Must Have] Buat/reservasi project Cloudflare Workers dengan nama stabil menuju `warungkit-api.<cloudflare-subdomain>.workers.dev`
+- [x] [Must Have] Buat/reservasi project Cloudflare Workers dengan nama stabil menuju `warungkit-api.<cloudflare-subdomain>.workers.dev`
   - Why it matters: URL publik backend harus stabil karena menjadi endpoint webhook Mayar; reservasi nama project dilakukan lebih awal agar tidak berubah mendekati hari-H, terlepas dari kapan endpoint diimplementasikan.
   - Claude Skill: —
   - Dependency: Akun Cloudflare tersedia.
@@ -251,7 +251,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Nama project Worker dan URL publiknya terkonfirmasi dan terdokumentasi untuk digunakan pada deployment (P10) dan registrasi webhook Mayar (P8) di kemudian hari. Implementasi dan validasi `GET /health` yang benar-benar merespons tidak menjadi syarat penyelesaian tahap ini — itu adalah tugas P6 (implementasi) dan P10 (validasi publik).
   - Risk if skipped: Webhook Mayar tidak dapat didaftarkan ke URL yang stabil.
 
-- [ ] [Must Have] Buat project Supabase; simpan `SUPABASE_SECRET_KEY` sebagai Worker secret dan `SUPABASE_URL` sebagai Worker configuration variable backend-only
+- [x] [Must Have] Buat project Supabase; simpan `SUPABASE_SECRET_KEY` sebagai Worker secret dan `SUPABASE_URL` sebagai Worker configuration variable backend-only
   - Why it matters: `SUPABASE_SECRET_KEY` adalah rahasia paling sensitif dalam proyek ini — tidak boleh bocor ke browser. `SUPABASE_URL` bukan rahasia, tetapi tetap backend-only dan tidak boleh di-commit dengan nilai produksi. (BRD PDF mungkin menyebut kredensial ini dengan istilah lama "service role key" — standar implementasi WarungKit menggunakan `SUPABASE_SECRET_KEY`.)
   - Claude Skill: database-engineering, security-review
   - Dependency: Akun Supabase tersedia.
@@ -259,7 +259,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: `SUPABASE_SECRET_KEY` tidak muncul di kode, `.env.example`, atau frontend build; `SUPABASE_URL` tidak muncul di frontend build.
   - Risk if skipped: Kebocoran akses penuh ke database (SC-01).
 
-- [ ] [Must Have] Buat akun Mayar sandbox/test dan simpan `MAYAR_API_KEY` hanya di Worker secret
+- [x] [Must Have] Buat akun Mayar sandbox/test dan simpan `MAYAR_API_KEY` hanya di Worker secret
   - Why it matters: Kredensial pembayaran adalah target risiko keamanan utama BRD.
   - Claude Skill: payment-integration, security-review
   - Dependency: Akun Mayar tersedia.
@@ -267,7 +267,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: `MAYAR_API_KEY` tidak pernah muncul di frontend bundle atau network tab browser.
   - Risk if skipped: Kebocoran kredensial pembayaran (Threat: Leaked payment key).
 
-- [ ] [Must Have] Validasi izin/scope API key Mayar sandbox mencakup pembuatan invoice dan query status pembayaran
+- [x] [Must Have] Validasi izin/scope API key Mayar sandbox mencakup pembuatan invoice dan query status pembayaran
   - Why it matters: Key dengan izin tidak lengkap akan menggagalkan demo payment saat live.
   - Claude Skill: payment-integration
   - Dependency: Akun Mayar sandbox dibuat.
@@ -275,7 +275,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Test call manual (curl/Postman) berhasil membuat invoice test dan membaca statusnya.
   - Risk if skipped: Kegagalan integrasi baru diketahui saat implementasi P8, mepet H-3 hari.
 
-- [ ] [Should Have] Tentukan `ALLOWED_ORIGINS` awal mengarah ke penamaan URL Cloudflare Pages demo yang sudah dikunci (`warungkit-demo.pages.dev`)
+- [x] [Should Have] Tentukan `ALLOWED_ORIGINS` awal mengarah ke penamaan URL Cloudflare Pages demo yang sudah dikunci (`warungkit-demo.pages.dev`)
   - Why it matters: CORS harus dikunci sejak awal, bukan ditambal di akhir (SC-06) — nilai awal ini bisa ditentukan dari penamaan URL yang dikunci di P4, meskipun project Pages sesungguhnya baru dibuat di P10.
   - Claude Skill: security-review, backend-api
   - Dependency: Penamaan URL Cloudflare Pages dikunci di P4.
@@ -285,7 +285,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 ### P5. Database Schema, RLS, and Seed Data
 
-- [ ] [Must Have] Buat migration untuk tabel `products` sesuai BRD Section 7.1
+- [x] [Must Have] Buat migration untuk tabel `products` sesuai BRD Section 7.1
   - Why it matters: Menjadi source of truth harga dan katalog — tidak boleh diubah dari klien.
   - Claude Skill: database-engineering
   - Dependency: Project Supabase P4 aktif.
@@ -293,7 +293,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Kolom mencakup `id` (UUID), `slug`, `name`, `description`, `price_idr`, `product_type`, `is_active`, `sort_order`, `created_at`, `updated_at`.
   - Risk if skipped: Tidak ada sumber kebenaran harga yang terstruktur (BR-03).
 
-- [ ] [Must Have] Buat migration untuk tabel `orders` sesuai BRD Section 7.1
+- [x] [Must Have] Buat migration untuk tabel `orders` sesuai BRD Section 7.1
   - Why it matters: Menyimpan state checkout dan pembayaran sebagai satu-satunya sumber kebenaran status order.
   - Claude Skill: database-engineering
   - Dependency: Migration `products` selesai.
@@ -301,7 +301,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Kolom mencakup `id`, `order_code`, `product_id`, `customer_name`, `customer_email`, `customer_phone`, `amount_idr`, `status`, `mayar_invoice_id`, `mayar_invoice_url`, `receipt_token`, `paid_at`, `metadata`, timestamps.
   - Risk if skipped: Tidak ada tempat menyimpan state pending→paid secara auditable.
 
-- [ ] [Must Have] Buat migration untuk tabel `payment_events` sesuai BRD Section 7.1
+- [x] [Must Have] Buat migration untuk tabel `payment_events` sesuai BRD Section 7.1
   - Why it matters: Menjadi audit trail idempotent untuk mendeteksi webhook duplikat.
   - Claude Skill: database-engineering, payment-integration
   - Dependency: Migration `orders` selesai.
@@ -309,7 +309,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Kolom mencakup `id`, `provider`, `provider_event_hash`, `provider_event_id`, `sanitized_payload`, `processing_status`, `processed_at`, `order_id`, timestamps; ada unique constraint pada hash/event id.
   - Risk if skipped: Webhook replay dapat diproses berkali-kali (BR-07).
 
-- [ ] [Must Have] Buat migration untuk tabel `checkout_idempotency` sesuai BRD Section 7.1
+- [x] [Must Have] Buat migration untuk tabel `checkout_idempotency` sesuai BRD Section 7.1
   - Why it matters: Mencegah duplikasi order dari retry/double-click checkout.
   - Claude Skill: database-engineering, payment-integration
   - Dependency: Migration `orders` selesai.
@@ -317,7 +317,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Kolom mencakup `id`, `idempotency_key` (unique), `request_hash`, `order_id`, `response_payload`, `expires_at`, timestamps.
   - Risk if skipped: Klik ganda checkout menghasilkan order ganda (BR-11).
 
-- [ ] [Must Have] Aktifkan RLS di seluruh tabel (`products`, `orders`, `payment_events`, `checkout_idempotency`)
+- [x] [Must Have] Aktifkan RLS di seluruh tabel (`products`, `orders`, `payment_events`, `checkout_idempotency`)
   - Why it matters: Non-negotiable rule proyek — tidak boleh ada tabel tanpa RLS.
   - Claude Skill: database-engineering, security-review
   - Dependency: Seluruh migration tabel selesai.
@@ -325,7 +325,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Query dari anon key tanpa policy eksplisit ditolak oleh Supabase.
   - Risk if skipped: Browser dapat mengakses data sensitif langsung (SC-04, BR-10).
 
-- [ ] [Must Have] Buat policy RLS: hanya `products` yang `is_active = true` dapat dibaca publik, tanpa policy permisif di tabel sensitif
+- [x] [Must Have] Buat policy RLS: hanya `products` yang `is_active = true` dapat dibaca publik, tanpa policy permisif di tabel sensitif
   - Why it matters: Katalog perlu dapat dibaca publik, tapi order/payment tidak boleh diakses browser sama sekali.
   - Claude Skill: database-engineering, security-review
   - Dependency: RLS diaktifkan.
@@ -333,7 +333,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Anon key hanya bisa SELECT produk aktif; tidak ada SELECT/INSERT/UPDATE anon pada `orders`, `payment_events`, `checkout_idempotency`.
   - Risk if skipped: Kebocoran data pelanggan atau manipulasi order dari browser.
 
-- [ ] [Must Have] Buat `seed.sql` berisi 3 produk demo dengan harga final dari P0
+- [x] [Must Have] Buat `seed.sql` berisi 3 produk demo dengan harga final dari P0
   - Why it matters: Data demo harus konsisten setiap kali database di-reset untuk rehearsal.
   - Claude Skill: database-engineering
   - Dependency: Migration `products` selesai, harga final dikonfirmasi (P0).
@@ -341,7 +341,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Menjalankan seed menghasilkan tepat 3 produk aktif sesuai BRD Section 3.2.
   - Risk if skipped: Data demo tidak konsisten antar rehearsal, menyulitkan validasi.
 
-- [ ] [Should Have] Tambahkan index dan unique constraint pada kolom pencarian tinggi (`order_code`, `slug`, `provider_event_hash`, `idempotency_key`)
+- [x] [Should Have] Tambahkan index dan unique constraint pada kolom pencarian tinggi (`order_code`, `slug`, `provider_event_hash`, `idempotency_key`)
   - Why it matters: Menjaga performa query tetap cepat (NFR performance < 3 detik) dan mencegah duplikasi data di level database.
   - Claude Skill: database-engineering
   - Dependency: Seluruh migration tabel selesai.
@@ -351,7 +351,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 ### P6. Backend API Foundation
 
-- [ ] [Must Have] Setup project Hono di `apps/api` dengan struktur route/service/repository terpisah
+- [x] [Must Have] Setup project Hono di `apps/api` dengan struktur route/service/repository terpisah
   - Why it matters: Pemisahan layer memudahkan validasi keamanan dan pengujian terisolasi.
   - Claude Skill: backend-api
   - Dependency: P1 struktur monorepo, P2 skill backend-api.
@@ -359,7 +359,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: `pnpm --filter api build` berhasil tanpa error.
   - Risk if skipped: Logic tercampur, menyulitkan audit keamanan sebelum demo.
 
-- [ ] [Must Have] Implementasikan `GET /health`
+- [x] [Must Have] Implementasikan `GET /health`
   - Why it matters: Endpoint dasar untuk memverifikasi Worker hidup sebelum debugging fitur lain.
   - Claude Skill: backend-api
   - Dependency: Setup Hono selesai.
@@ -367,7 +367,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Dapat diakses dari URL publik Worker P4.
   - Risk if skipped: Tidak ada cara cepat memverifikasi deployment Worker saat troubleshooting live.
 
-- [ ] [Must Have] Implementasikan `GET /api/products` yang membaca dari tabel `products` via repository layer
+- [x] [Must Have] Implementasikan `GET /api/products` yang membaca dari tabel `products` via repository layer
   - Why it matters: Menjadi sumber katalog untuk frontend, memastikan harga selalu berasal dari database.
   - Claude Skill: backend-api, database-engineering
   - Dependency: Migration `products` (P5) dan seed data selesai.
@@ -375,7 +375,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Response hanya berisi produk dengan `is_active = true`, field harga sama dengan database.
   - Risk if skipped: Frontend tidak punya data katalog nyata untuk ditampilkan.
 
-- [ ] [Must Have] Terapkan middleware CORS dengan allowlist dari `ALLOWED_ORIGINS`
+- [x] [Must Have] Terapkan middleware CORS dengan allowlist dari `ALLOWED_ORIGINS`
   - Why it matters: Non-negotiable rule — tidak boleh ada origin permisif di demo final.
   - Claude Skill: backend-api, security-review
   - Dependency: `ALLOWED_ORIGINS` ditentukan di P4.
@@ -383,7 +383,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Request dari origin selain yang diizinkan ditolak.
   - Risk if skipped: Threat "Misconfigured CORS" terealisasi.
 
-- [ ] [Must Have] Terapkan request ID dan safe error handler di seluruh route
+- [x] [Must Have] Terapkan request ID dan safe error handler di seluruh route
   - Why it matters: Observability tanpa mengekspos detail teknis ke klien.
   - Claude Skill: backend-api, security-review
   - Dependency: Setup Hono selesai.
@@ -391,7 +391,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Error response tidak menampilkan stack trace atau detail internal ke klien; request ID konsisten muncul di log dan response.
   - Risk if skipped: Kebocoran informasi teknis via pesan error (SC-09).
 
-- [ ] [Should Have] Siapkan struktur rate-limit readiness (belum tentu aktif penuh untuk demo)
+- [x] [Should Have] Siapkan struktur rate-limit readiness (belum tentu aktif penuh untuk demo)
   - Why it matters: BRD meminta "readiness", bukan implementasi penuh, agar tidak over-engineer untuk skala webinar.
   - Claude Skill: backend-api, security-review
   - Dependency: Middleware dasar selesai.
@@ -403,7 +403,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 > **Scope note (keputusan final Q-04, lihat Section 17):** `apps/web` hanya berisi storefront publik (katalog, checkout, status pembayaran). Tidak ada halaman admin yang dibangun di frontend ini — bukti transaksi untuk presenter ditunjukkan langsung dari dashboard Supabase terkontrol (lihat P11 dan Section 15).
 
-- [ ] [Must Have] Setup project React + Vite + TypeScript + Tailwind di `apps/web`
+- [x] [Must Have] Setup project React + Vite + TypeScript + Tailwind di `apps/web`
   - Why it matters: Fondasi frontend sesuai keputusan BRD.
   - Claude Skill: frontend-design
   - Dependency: P1 struktur monorepo.
@@ -411,7 +411,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: `pnpm --filter web build` berhasil.
   - Risk if skipped: Tidak ada dasar untuk membangun UI katalog dan checkout.
 
-- [ ] [Must Have] Bangun halaman katalog yang mengambil data dari `GET /api/products`
+- [x] [Must Have] Bangun halaman katalog yang mengambil data dari `GET /api/products`
   - Why it matters: Bagian "Discover" dari user journey utama.
   - Claude Skill: frontend-design
   - Dependency: P6 endpoint `/api/products` selesai.
@@ -419,7 +419,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Data yang tampil identik dengan data di database (bukan hardcode di frontend).
   - Risk if skipped: Demo tidak menunjukkan alur nyata backend-driven.
 
-- [ ] [Must Have] Bangun form checkout (nama, email, nomor WhatsApp) dengan validasi client-side
+- [x] [Must Have] Bangun form checkout (nama, email, nomor WhatsApp) dengan validasi client-side
   - Why it matters: Validasi client-side untuk UX, tapi bukan satu-satunya lapisan keamanan (SC-03).
   - Claude Skill: frontend-design
   - Dependency: Skema Zod bersama di `packages/contracts` tersedia.
@@ -427,7 +427,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Field wajib tervalidasi sebelum submit; error message accessible (visible, label terkait).
   - Risk if skipped: UX buruk saat live demo jika ada input salah.
 
-- [ ] [Must Have] Kirim `productId`, data customer, dan `idempotencyKey` (client-generated UUID) ke `POST /api/checkout`
+- [x] [Must Have] Kirim `productId`, data customer, dan `idempotencyKey` (client-generated UUID) ke `POST /api/checkout`
   - Why it matters: Klien tidak pernah mengirim harga final — hanya identitas produk (BR-02).
   - Claude Skill: frontend-design, payment-integration
   - Dependency: Endpoint `/api/checkout` (P8) tersedia.
@@ -435,7 +435,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Network tab tidak pernah menunjukkan field harga yang dikirim dari klien.
   - Risk if skipped: Celah manipulasi harga dari dev tools browser (Threat: Price manipulation).
 
-- [ ] [Must Have] Redirect otomatis ke `paymentUrl` dari response checkout
+- [x] [Must Have] Redirect otomatis ke `paymentUrl` dari response checkout
   - Why it matters: Bagian "Pay" dari user journey — customer diarahkan ke halaman Mayar.
   - Claude Skill: frontend-design
   - Dependency: Response checkout mengandung `paymentUrl` valid.
@@ -443,7 +443,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Redirect terjadi hanya setelah response sukses dari backend, bukan simulasi di frontend.
   - Risk if skipped: Alur demo terputus antara checkout dan pembayaran.
 
-- [ ] [Must Have] Bangun halaman status pembayaran dengan polling 3 detik, batas maksimum 45 detik, dan tombol cek manual "Cek Status Pembayaran"
+- [x] [Must Have] Bangun halaman status pembayaran dengan polling 3 detik, batas maksimum 45 detik, dan tombol cek manual "Cek Status Pembayaran"
   - Why it matters: Status page harus mencerminkan state database, bukan asumsi dari redirect. Keputusan final (menjawab Open Question Q-02, lihat Section 17): halaman membaca `orderId` dan receipt token dari alur kembalian pembayaran, memanggil `GET /api/orders/:orderId` dengan token tersebut, melakukan polling otomatis setiap 3 detik, berhenti polling otomatis setelah maksimum 45 detik, lalu menampilkan tombol manual "Cek Status Pembayaran" agar pengguna dapat memeriksa ulang status kapan saja setelah polling berhenti.
   - Claude Skill: frontend-design, security-review
   - Dependency: Endpoint `/api/orders/:orderId` (P8) tersedia dan mendukung akses via receipt token.
@@ -451,7 +451,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Status "paid" hanya muncul jika backend mengembalikan `paid` dari database setelah verifikasi server-side terhadap Mayar — parameter query dari redirect tidak pernah dipercaya sebagai bukti pembayaran (BR-05). Polling berhenti otomatis tepat pada atau sebelum 45 detik; tombol manual tetap berfungsi tanpa batas waktu setelahnya.
   - Risk if skipped: Risiko keamanan terbesar — fake paid status dapat ditampilkan begitu saja dari URL; tanpa fallback manual, pengguna terjebak jika webhook terlambat lebih dari 45 detik.
 
-- [ ] [Should Have] Terapkan aksesibilitas dasar: label form, fokus keyboard, responsif mobile
+- [x] [Should Have] Terapkan aksesibilitas dasar: label form, fokus keyboard, responsif mobile
   - Why it matters: NFR aksesibilitas BRD Section 5.2.
   - Claude Skill: frontend-design
   - Dependency: Form checkout dan katalog selesai.
@@ -461,7 +461,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 ### P8. Mayar Payment and Webhook Integration
 
-- [ ] [Must Have] Buat service/adapter Mayar terisolasi di satu layer (`apps/api/src/services/mayar`)
+- [x] [Must Have] Buat service/adapter Mayar terisolasi di satu layer (`apps/api/src/services/mayar`)
   - Why it matters: BRD eksplisit meminta provider client terisolasi, memudahkan audit dan perubahan API provider.
   - Claude Skill: payment-integration
   - Dependency: `MAYAR_API_KEY` tersedia sebagai Worker secret (P4).
@@ -469,7 +469,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Seluruh pemanggilan Mayar API melalui satu modul ini saja.
   - Risk if skipped: Duplikasi logic pemanggilan Mayar tersebar dan sulit diaudit.
 
-- [ ] [Must Have] Implementasikan `POST /api/checkout`: validasi input, resolve produk dari DB, buat order `pending`, buat invoice Mayar, simpan identifier
+- [x] [Must Have] Implementasikan `POST /api/checkout`: validasi input, resolve produk dari DB, buat order `pending`, buat invoice Mayar, simpan identifier
   - Why it matters: Ini adalah jantung alur BR-01 s.d. BR-11.
   - Claude Skill: backend-api, payment-integration, database-engineering
   - Dependency: Migration `orders` (P5), service Mayar, `checkout_idempotency` table.
@@ -477,7 +477,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Harga selalu diambil dari `products.price_idr`; permintaan dengan `idempotencyKey` sama tidak membuat order kedua.
   - Risk if skipped: Tanpa endpoint ini tidak ada demo checkout sama sekali.
 
-- [ ] [Must Have] Implementasikan `GET /api/orders/:orderId` dengan pembatasan akses aman (receipt token) yang mendukung polling frontend
+- [x] [Must Have] Implementasikan `GET /api/orders/:orderId` dengan pembatasan akses aman (receipt token) yang mendukung polling frontend
   - Why it matters: Status order adalah data yang perlu dibatasi agar tidak bisa diakses sembarang orang menebak ID. Endpoint ini juga menjadi dasar keputusan final polling status pembayaran (Q-02, lihat Section 17): dipanggil setiap 3 detik oleh frontend selama maksimum 45 detik, dan dipanggil ulang oleh tombol manual "Cek Status Pembayaran" setelah itu.
   - Claude Skill: backend-api, security-review
   - Dependency: Tabel `orders` memiliki `receipt_token`.
@@ -485,7 +485,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Request tanpa token yang benar tidak mengembalikan detail order. Status "paid" hanya dikembalikan setelah verifikasi server-side terhadap Mayar tersimpan di database — tidak pernah berdasarkan asumsi dari redirect.
   - Risk if skipped: Order pelanggan lain dapat diakses hanya dengan menebak ID (BR-10).
 
-- [ ] [Must Have] Implementasikan `POST /api/webhooks/mayar`: terima event, hash/dedup, verifikasi status ke Mayar server-side, update status order idempotent
+- [x] [Must Have] Implementasikan `POST /api/webhooks/mayar`: terima event, hash/dedup, verifikasi status ke Mayar server-side, update status order idempotent
   - Why it matters: Ini satu-satunya jalur sah untuk mengubah order menjadi `paid` (BR-06).
   - Claude Skill: backend-api, payment-integration, security-review
   - Dependency: Tabel `payment_events`, service Mayar, endpoint `/api/checkout` selesai.
@@ -493,7 +493,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Event dengan hash/id yang sama tidak memproses transisi status dua kali; status hanya berubah setelah verifikasi server-side ke Mayar API (bukan hanya percaya payload webhook).
   - Risk if skipped: Celah keamanan pembayaran paling kritikal — webhook spoofing/replay.
 
-- [ ] [Must Have] Implementasikan transisi status sesuai BRD Section 7.4 (`pending→payment_created→paid/expired/failed`, `pending→cancelled`, `paid→paid` no-op)
+- [x] [Must Have] Implementasikan transisi status sesuai BRD Section 7.4 (`pending→payment_created→paid/expired/failed`, `pending→cancelled`, `paid→paid` no-op)
   - Why it matters: Mencegah transisi status yang tidak valid atau tidak konsisten.
   - Claude Skill: backend-api, database-engineering
   - Dependency: Endpoint checkout dan webhook selesai.
@@ -501,7 +501,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Transisi di luar tabel BRD Section 7.4 ditolak oleh logic aplikasi.
   - Risk if skipped: Status order bisa berubah secara tidak konsisten atau mundur (mis. paid → pending).
 
-- [ ] [Must Have] Daftarkan URL webhook publik Worker ke dashboard Mayar sandbox
+- [x] [Must Have] Daftarkan URL webhook publik Worker ke dashboard Mayar sandbox
   - Why it matters: Tanpa registrasi ini, Mayar tidak dapat mengirim event ke backend.
   - Claude Skill: payment-integration
   - Dependency: Worker dideploy publik (P4/P10).
@@ -509,7 +509,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Test webhook dari dashboard Mayar berhasil diterima backend.
   - Risk if skipped: Demo live tidak dapat menerima notifikasi pembayaran sama sekali.
 
-- [ ] [Should Have] Tangani skenario expired dan failed payment di webhook handler
+- [x] [Should Have] Tangani skenario expired dan failed payment di webhook handler
   - Why it matters: Demo harus bisa menjelaskan kegagalan pembayaran, bukan hanya jalur sukses.
   - Claude Skill: payment-integration
   - Dependency: Webhook handler dasar selesai.
@@ -527,7 +527,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Tidak ditemukan pola API key/`SUPABASE_SECRET_KEY` di riwayat commit.
   - Risk if skipped: Rahasia bocor permanen meski sudah "diperbaiki" di commit terbaru.
 
-- [ ] [Must Have] Tulis unit test untuk skema Zod, resolusi harga, helper idempotency, dan transisi status order
+- [x] [Must Have] Tulis unit test untuk skema Zod, resolusi harga, helper idempotency, dan transisi status order
   - Why it matters: Validasi logic bisnis kritikal secara terisolasi.
   - Claude Skill: testing-qa
   - Dependency: `packages/contracts` dan service order selesai.
@@ -535,7 +535,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Coverage mencakup semua transisi status valid dan minimal satu kasus invalid.
   - Risk if skipped: Bug logic bisnis baru terdeteksi saat demo live.
 
-- [ ] [Must Have] Tulis API integration test untuk `/health`, `/api/products`, validasi checkout, dan duplicate checkout
+- [x] [Must Have] Tulis API integration test untuk `/health`, `/api/products`, validasi checkout, dan duplicate checkout
   - Why it matters: Memverifikasi kontrak request/response sesuai BRD Section 9.
   - Claude Skill: testing-qa, backend-api
   - Dependency: Endpoint P6/P8 selesai.
@@ -543,7 +543,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Test eksplisit memverifikasi bahwa checkout duplikat (idempotency key sama) tidak membuat order kedua.
   - Risk if skipped: Idempotency BR-11 tidak benar-benar terverifikasi otomatis.
 
-- [ ] [Must Have] Tulis webhook test untuk event duplikat, event tidak valid, kegagalan verifikasi, dan transisi ke paid
+- [x] [Must Have] Tulis webhook test untuk event duplikat, event tidak valid, kegagalan verifikasi, dan transisi ke paid
   - Why it matters: Ini adalah area risiko keamanan tertinggi di seluruh proyek.
   - Claude Skill: testing-qa, payment-integration
   - Dependency: Endpoint webhook P8 selesai.
@@ -575,7 +575,7 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
   - Acceptance criteria: Tidak ada kerentanan severity tinggi/kritikal yang belum ditangani.
   - Risk if skipped: Risiko keamanan dari pihak ketiga tidak diketahui sebelum demo publik.
 
-- [ ] [Must Have] Verifikasi bahwa observabilitas order/payment hanya via dashboard Supabase terkontrol, bukan admin page WarungKit
+- [x] [Must Have] Verifikasi bahwa observabilitas order/payment hanya via dashboard Supabase terkontrol, bukan admin page WarungKit
   - Why it matters: Keputusan final Q-04 (lihat Section 17) — WarungKit tidak membangun admin dashboard untuk MVP webinar; dashboard Supabase digunakan khusus untuk observabilitas presenter, bukan bagian dari produk publik.
   - Claude Skill: security-review, database-engineering
   - Dependency: RLS (P5) aktif; akun Supabase presenter memiliki akses dashboard yang sesuai.
@@ -687,49 +687,49 @@ WarungKit dinyatakan **demo ready** hanya jika seluruh kondisi berikut terpenuhi
 
 ## 5. Required Claude Code Skills
 
-- [ ] **frontend-design**
+- [x] **frontend-design**
   - Purpose: Memastikan UI katalog, checkout, dan status pembayaran responsif, accessible, dan bebas gaya generik AI.
   - When it must be invoked: Setiap kali membangun/mengubah komponen di `apps/web`.
   - Required inputs: Kontrak Zod dari `packages/contracts`, daftar endpoint yang tersedia, prinsip desain BRD Section 5.2 (NFR Accessibility).
   - Non-negotiable rules: Tidak menampilkan/menyimpan data sensitif di state client; label form dan pesan error selalu visible; tidak hardcode harga/produk di frontend.
   - Completion criteria: Lint, typecheck, build lulus; halaman accessible via keyboard; data katalog berasal dari API, bukan hardcode.
 
-- [ ] **backend-api**
+- [x] **backend-api**
   - Purpose: Membangun route Hono dengan validasi, error handling aman, dan struktur service/repository yang jelas.
   - When it must be invoked: Setiap kali membuat/mengubah endpoint di `apps/api`.
   - Required inputs: Skema Zod bersama, daftar environment variable (Section 7), aturan CORS/trust boundary BRD Section 6.3.
   - Non-negotiable rules: Semua input divalidasi ulang di backend; error response tidak membocorkan detail teknis; harga selalu diresolusi dari database.
   - Completion criteria: Lint, typecheck, test, build lulus; endpoint sesuai kontrak BRD Section 9.1; CORS allowlist aktif.
 
-- [ ] **database-engineering**
+- [x] **database-engineering**
   - Purpose: Mengelola migration, RLS, index, dan struktur repository layer Supabase.
   - When it must be invoked: Setiap kali skema database berubah atau query baru dibutuhkan.
   - Required inputs: Model entitas BRD Section 7.1, aturan lifecycle order BRD Section 7.3-7.4.
   - Non-negotiable rules: Tidak ada perubahan skema tanpa migration file; RLS wajib aktif di semua tabel; tidak ada policy anonim permisif.
   - Completion criteria: Migration dapat dijalankan ulang dari nol; RLS terverifikasi menolak akses anon yang tidak sah; seed data konsisten.
 
-- [ ] **payment-integration**
+- [x] **payment-integration**
   - Purpose: Membangun adapter Mayar, alur checkout, dan verifikasi webhook yang aman dan idempotent.
   - When it must be invoked: Setiap kali mengubah logic pembuatan invoice, webhook, atau transisi status order.
   - Required inputs: Dokumentasi Mayar terkini (bukan asumsi dari BRD), kredensial sandbox, tabel `payment_events`/`checkout_idempotency`.
   - Non-negotiable rules: Verifikasi status pembayaran selalu server-side; webhook harus idempotent; status "paid" tidak pernah diset dari redirect browser semata.
   - Completion criteria: Test webhook duplikat/invalid lulus; transisi status sesuai BRD Section 7.4; smoke test checkout-ke-paid berhasil di sandbox.
 
-- [ ] **security-review**
+- [x] **security-review**
   - Purpose: Memvalidasi tidak ada kebocoran rahasia, CORS aman, PII terjaga, dan checklist keamanan live demo terpenuhi.
   - When it must be invoked: Sebelum setiap deployment publik dan sebelum rehearsal/live demo.
   - Required inputs: Checklist BRD Section 8.3, daftar environment variable, akses ke riwayat git untuk scanning.
   - Non-negotiable rules: Tidak ada secret di kode/log/screenshot; RLS aktif; CORS allowlist eksplisit; PII di-mask di log.
   - Completion criteria: Checklist keamanan live demo tercentang penuh; secret scan bersih; review CORS dan RLS terdokumentasi.
 
-- [ ] **testing-qa**
+- [x] **testing-qa**
   - Purpose: Menjalankan dan menjaga lapisan test (unit, API, webhook, manual smoke) tetap konsisten.
   - When it must be invoked: Setelah setiap perubahan fitur signifikan dan sebelum deployment ke environment demo.
   - Required inputs: Lapisan test BRD Section 12.1, akses environment sandbox untuk smoke test.
   - Non-negotiable rules: Tidak ada fitur dianggap selesai tanpa test yang relevan; smoke test manual wajib sebelum rehearsal.
   - Completion criteria: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` lulus; smoke test checkout tercatat berhasil.
 
-- [ ] **demo-runbook**
+- [x] **demo-runbook**
   - Purpose: Mengelola checkpoint branch, jadwal rehearsal, dan keamanan operasional saat live demo.
   - When it must be invoked: Menjelang dan selama fase rehearsal (P11), serta saat menyiapkan sesi live.
   - Required inputs: Checkpoint branch BRD Appendix B, rehearsal timeline BRD Section 11.3, operator checklist BRD Section 11.4.
@@ -956,9 +956,9 @@ Nilai ini boleh tersedia di build frontend dan tidak boleh pernah berisi rahasia
 
 ## 13. Deployment Checklist
 
-- [ ] Cloudflare Pages project untuk `apps/web` dideploy ke `warungkit-demo.pages.dev` dengan nama project stabil.
-- [ ] Cloudflare Workers project untuk `apps/api` dideploy ke `warungkit-api.<cloudflare-subdomain>.workers.dev` dengan nama project stabil.
-- [ ] Worker secret (`MAYAR_API_KEY`, `SUPABASE_SECRET_KEY`) diset via `wrangler secret put`; Worker configuration variables (`MAYAR_API_BASE_URL`, `SUPABASE_URL`, `ALLOWED_ORIGINS`, `ENVIRONMENT`) diset sebagai konfigurasi backend-only tanpa nilai produksi ter-commit.
+- [ ] Cloudflare Pages project untuk `apps/web` dideploy ke `warungkit-demo.pages.dev` dengan nama project stabil. *(In Progress — repository GitHub sudah terhubung, Root directory dikoreksi ke `apps/web`; sedang memperbaiki "Deploy command"/"Non-production branch deploy command" yang salah berisi perintah `wrangler` bergaya Workers, menyebabkan langkah deploy gagal `EUNSUPPORTEDPROTOCOL` setelah build Vite sukses.)*
+- [ ] Cloudflare Workers project untuk `apps/api` dideploy ke `warungkit-api.<cloudflare-subdomain>.workers.dev` dengan nama project stabil. *(Belum dikerjakan pada sesi ini.)*
+- [ ] Worker secret (`MAYAR_API_KEY`, `SUPABASE_SECRET_KEY`) diset via `wrangler secret put`; Worker configuration variables (`MAYAR_API_BASE_URL`, `SUPABASE_URL`, `ALLOWED_ORIGINS`, `ENVIRONMENT`) diset sebagai konfigurasi backend-only tanpa nilai produksi ter-commit. *(Belum dikerjakan.)*
 - [ ] Environment variable frontend (`VITE_API_BASE_URL`) diset di dashboard Cloudflare Pages, bukan hardcode di kode.
 - [ ] `ALLOWED_ORIGINS` production dikunci ke URL Cloudflare Pages final sebelum rehearsal.
 - [ ] Nama project Cloudflare (Pages dan Workers) dikunci minimal H-7 hari sebelum webinar, tidak diganti mendekati hari-H.
@@ -1013,16 +1013,16 @@ Nilai ini boleh tersedia di build frontend dan tidak boleh pernah berisi rahasia
 
 ## 16. Git Checkpoints
 
-- [ ] `docs: add BRD PDF`
-- [ ] `chore: scaffold monorepo baseline`
-- [ ] `docs: add Claude rules and skills`
-- [ ] `feat: add database schema and seed products`
-- [ ] `feat: add API foundation`
-- [ ] `feat: add storefront and checkout UI`
-- [ ] `feat: integrate Mayar invoice flow`
-- [ ] `feat: add webhook verification flow`
-- [ ] `test: add integration and security coverage`
-- [ ] `chore: prepare webinar demo release`
+- [x] `docs: add BRD PDF` — committed as `8ca8bc6 docs: add BRD and project checklist`
+- [x] `chore: scaffold monorepo baseline` — committed as `c11a042`
+- [x] `docs: add Claude rules and skills` — committed as `01da9f3 docs: add Claude rules and architecture runbooks`
+- [x] `feat: add database schema and seed products` — committed as `fef05ea feat: add WarungKit core database schema and seed data`
+- [x] `feat: add API foundation` — committed as `cad77fd feat: add secure API foundation and shared contracts`
+- [x] `feat: add storefront and checkout UI` — committed as `bf50268 feat: add WarungKit storefront and safe checkout UI`
+- [x] `feat: integrate Mayar invoice flow` — committed as `e2097d9 feat: add secure Mayar checkout and verification flow`
+- [x] `feat: add webhook verification flow` — covered within `e2097d9` (webhook + verification flow shipped together)
+- [x] `test: add integration and security coverage` — covered within `7d77a54 feat: complete secure Mayar checkout frontend integration` (frontend integration + test suite)
+- [ ] `chore: prepare webinar demo release` — pending; blocked on P10 deployment (Cloudflare Pages build config fix in progress) and P9 remaining items (secret scan, dependency audit, manual smoke test)
 
 ---
 
