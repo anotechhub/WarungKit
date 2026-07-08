@@ -7,5 +7,16 @@
   "workers_dev": true,
   "observability": {
     "enabled": true
+  },
+  // Non-secret, backend-only config vars only. MAYAR_API_KEY and
+  // SUPABASE_SECRET_KEY must never appear here — they live exclusively as
+  // encrypted Secret bindings set via the Cloudflare dashboard or
+  // `wrangler secret put`, never in this file or in git.
+  "vars": {
+    "ENVIRONMENT": "production",
+    "ALLOWED_ORIGINS": "https://warungkit-demo.anotechhub.workers.dev",
+    "FRONTEND_BASE_URL": "https://warungkit-demo.anotechhub.workers.dev",
+    "MAYAR_API_BASE_URL": "https://api.mayar.id/hl/v1",
+    "SUPABASE_URL": "https://jdduabvwgxxtbfetfgsy.supabase.co"
   }
 }
