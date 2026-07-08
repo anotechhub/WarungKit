@@ -14,6 +14,31 @@ const POLL_TIMEOUT_MS = 45_000
 // accept a malformed token and forward it to the backend.
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+// The receipt token is only ever held in memory and sessionStorage — never
+// localStorage (which would outlive the tab/session) — and the key is
+// scoped per orderId so unrelated orders never share a token slot.
+const sessionTokenKey = (orderId: string) => `warungkit:receipt-token:${orderId}`
+
+function readTokenFromSessionStorage(orderId: string): string | null {
+  try {
+    return sessionStorage.getItem(sessionTokenKey(orderId))
+  } catch {
+    // sessionStorage can throw in locked-down/private-browsing contexts —
+    // treat as "no stored token" rather than letting the page crash.
+    return null
+  }
+}
+
+function writeTokenToSessionStorage(orderId: string, token: string): void {
+  try {
+    sessionStorage.setItem(sessionTokenKey(orderId), token)
+  } catch {
+    // Best-effort only — if storage isn't available, the token still works
+    // for this page load via the URL/in-memory value; it just won't survive
+    // a reload after the URL is scrubbed.
+  }
+}
+
 type ViewState =
   | { kind: 'missing-params' }
   | { kind: 'loading' }
@@ -50,9 +75,24 @@ const TONE_ICON = {
 export function PaymentStatusPage() {
   const [searchParams] = useSearchParams()
   const orderId = searchParams.get('orderId')
-  const token = searchParams.get('token')
+  const urlToken = searchParams.get('token')
 
-  const hasValidParams = Boolean(orderId && token && uuidPattern.test(orderId) && uuidPattern.test(token))
+  const orderIdIsValid = Boolean(orderId && uuidPattern.test(orderId))
+  const urlTokenIsValid = Boolean(urlToken && uuidPattern.test(urlToken))
+
+  // Resolve the token once per orderId: prefer the URL (first load, direct
+  // Mayar redirect), otherwise recover it from sessionStorage (e.g. a
+  // reload after the URL has already been scrubbed). This runs during
+  // render (not an effect) so the very first render already has the right
+  // token — avoiding an extra "loading" flash — but it never re-runs once
+  // resolved, since useState's initializer only executes on mount.
+  const [token] = useState<string | null>(() => {
+    if (!orderIdIsValid) return null
+    if (urlTokenIsValid && urlToken) return urlToken
+    return readTokenFromSessionStorage(orderId as string)
+  })
+
+  const hasValidParams = Boolean(orderId && orderIdIsValid && token && uuidPattern.test(token))
 
   const [view, setView] = useState<ViewState>(hasValidParams ? { kind: 'loading' } : { kind: 'missing-params' })
   const [pollingActive, setPollingActive] = useState(hasValidParams)
@@ -60,6 +100,21 @@ export function PaymentStatusPage() {
 
   const pollStartRef = useRef<number>(Date.now())
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Persist the token (scoped to this orderId) and strip it from the
+  // visible URL immediately after the first successful read — before any
+  // network request, screenshot, or recording could capture it. This is a
+  // plain history.replaceState, not a react-router navigation, so it never
+  // triggers a reload or a re-render loop.
+  useEffect(() => {
+    if (!orderId || !orderIdIsValid || !urlTokenIsValid || !urlToken) return
+
+    writeTokenToSessionStorage(orderId, urlToken)
+
+    const scrubbedUrl = new URL(window.location.href)
+    scrubbedUrl.searchParams.delete('token')
+    window.history.replaceState(window.history.state, '', `${scrubbedUrl.pathname}${scrubbedUrl.search}`)
+  }, [orderId, orderIdIsValid, urlToken, urlTokenIsValid])
 
   const fetchStatus = useCallback(async () => {
     if (!orderId || !token) return

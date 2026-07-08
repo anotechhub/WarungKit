@@ -8,6 +8,11 @@ const validOrderId = '22222222-2222-4222-8222-222222222222'
 const validToken = '33333333-3333-4333-8333-333333333333'
 
 function renderAt(path: string) {
+  // Keep the real jsdom window.location/history in sync with the
+  // MemoryRouter entry — PaymentStatusPage reads/mutates window.location
+  // directly (via history.replaceState) to scrub the token from the
+  // visible URL, independently of react-router's own in-memory history.
+  window.history.replaceState(null, '', path)
   return render(
     <MemoryRouter initialEntries={[path]}>
       <PaymentStatusPage />
@@ -34,6 +39,8 @@ describe('PaymentStatusPage', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.useRealTimers()
+    sessionStorage.clear()
+    window.history.replaceState(null, '', '/')
   })
 
   it('shows "Data Pesanan Tidak Lengkap" and never calls the API when orderId or token is missing', () => {
@@ -130,6 +137,104 @@ describe('PaymentStatusPage', () => {
 
     const button = await screen.findByRole('button', { name: /bukti pembayaran segera hadir/i })
     expect(button).toBeDisabled()
+  })
+})
+
+describe('PaymentStatusPage — URL token hygiene', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.useRealTimers()
+    sessionStorage.clear()
+    window.history.replaceState(null, '', '/')
+  })
+
+  it('stores the receipt token in sessionStorage, scoped to the orderId, on first load', async () => {
+    vi.spyOn(apiModule, 'getOrderStatus').mockResolvedValue(buildOrderStatus({ status: 'pending' }))
+
+    renderAt(`/payment-status?orderId=${validOrderId}&token=${validToken}`)
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /menunggu konfirmasi pembayaran/i })).toBeInTheDocument(),
+    )
+
+    expect(sessionStorage.getItem(`warungkit:receipt-token:${validOrderId}`)).toBe(validToken)
+  })
+
+  it('replaces the browser URL to drop the token while keeping orderId, without reloading', async () => {
+    vi.spyOn(apiModule, 'getOrderStatus').mockResolvedValue(buildOrderStatus({ status: 'pending' }))
+
+    renderAt(`/payment-status?orderId=${validOrderId}&token=${validToken}`)
+
+    await waitFor(() => {
+      const url = new URL(window.location.href)
+      expect(url.searchParams.get('orderId')).toBe(validOrderId)
+      expect(url.searchParams.has('token')).toBe(false)
+    })
+  })
+
+  it('still calls the backend order status API with the token internally after the URL is scrubbed', async () => {
+    const getOrderStatusSpy = vi
+      .spyOn(apiModule, 'getOrderStatus')
+      .mockResolvedValue(buildOrderStatus({ status: 'pending' }))
+
+    renderAt(`/payment-status?orderId=${validOrderId}&token=${validToken}`)
+
+    await waitFor(() => expect(getOrderStatusSpy).toHaveBeenCalledWith(validOrderId, validToken))
+  })
+
+  it('recovers the token from sessionStorage and loads successfully when the URL only has orderId (reload-like flow)', async () => {
+    sessionStorage.setItem(`warungkit:receipt-token:${validOrderId}`, validToken)
+    const getOrderStatusSpy = vi
+      .spyOn(apiModule, 'getOrderStatus')
+      .mockResolvedValue(buildOrderStatus({ status: 'pending' }))
+
+    renderAt(`/payment-status?orderId=${validOrderId}`)
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /menunggu konfirmasi pembayaran/i })).toBeInTheDocument(),
+    )
+    expect(getOrderStatusSpy).toHaveBeenCalledWith(validOrderId, validToken)
+  })
+
+  it('shows "Data Pesanan Tidak Lengkap" and never calls the API when the URL has only orderId and sessionStorage has no matching token', () => {
+    const getOrderStatusSpy = vi.spyOn(apiModule, 'getOrderStatus')
+
+    renderAt(`/payment-status?orderId=${validOrderId}`)
+
+    expect(screen.getByText(/data pesanan tidak lengkap/i)).toBeInTheDocument()
+    expect(getOrderStatusSpy).not.toHaveBeenCalled()
+  })
+
+  it('never renders the receipt token in the DOM, even immediately on first load before the URL is scrubbed', async () => {
+    vi.spyOn(apiModule, 'getOrderStatus').mockResolvedValue(buildOrderStatus({ status: 'pending' }))
+
+    const { container } = renderAt(`/payment-status?orderId=${validOrderId}&token=${validToken}`)
+
+    expect(container.innerHTML).not.toContain(validToken)
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /menunggu konfirmasi pembayaran/i })).toBeInTheDocument(),
+    )
+    expect(container.innerHTML).not.toContain(validToken)
+  })
+
+  it('the manual "Cek Status Pembayaran" recheck still uses the resolved token after the URL is scrubbed', async () => {
+    vi.useFakeTimers()
+    const getOrderStatusSpy = vi
+      .spyOn(apiModule, 'getOrderStatus')
+      .mockResolvedValue(buildOrderStatus({ status: 'pending' }))
+
+    renderAt(`/payment-status?orderId=${validOrderId}&token=${validToken}`)
+    await vi.waitFor(() => expect(getOrderStatusSpy).toHaveBeenCalledTimes(1))
+
+    await vi.advanceTimersByTimeAsync(45_000)
+
+    const manualButton = screen.getByRole('button', { name: /cek status pembayaran/i })
+    fireEvent.click(manualButton)
+
+    await vi.waitFor(() =>
+      expect(getOrderStatusSpy).toHaveBeenLastCalledWith(validOrderId, validToken),
+    )
   })
 })
 
