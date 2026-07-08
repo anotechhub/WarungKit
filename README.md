@@ -98,9 +98,16 @@ This repository follows the phased plan in `docs/PROJECT_CHECKLIST.md`:
 
 The root `package.json` now runs real workspace scripts: `dev:api`, `lint`, `typecheck`, `test`, and `build` all delegate to `pnpm -r --if-present <script>`, so they work today across `apps/api` and `packages/contracts` and will pick up `apps/web` automatically once it is scaffolded (no root script changes needed later). `format` and `format:check` run Prettier across the whole repo.
 
-## Frontend Deployment (Cloudflare Pages)
+## Frontend Deployment (Cloudflare Worker Static Assets)
 
-`apps/web` deploys to Cloudflare Pages (`warungkit-demo` → `https://warungkit-demo.pages.dev`) via [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) using GitHub Actions + `wrangler pages deploy` (Direct Upload) — **not** the Cloudflare dashboard's Git-connected build. See `docs/runbooks/frontend-pages-deployment.md` for the full explanation, required GitHub Secrets/Variables, and manual setup steps. The backend Worker (`warungkit-api`, `https://warungkit-api.anotechhub.workers.dev`) is deployed and configured separately and is out of scope for this workflow.
+`apps/web` deploys as a Cloudflare Worker Static Assets project named `warungkit-demo`, connected to GitHub via Cloudflare Workers Builds. Static assets are served from `apps/web/dist` (the Vite production build) through the `ASSETS` binding declared in `apps/web/wrangler.jsonc`; the Worker entrypoint (`apps/web/src/cloudflare-worker.ts`) contains no business logic — it only forwards requests to `env.ASSETS.fetch(request)`, with SPA fallback (`not_found_handling: "single-page-application"`) so client-side routes (`/`, `/checkout`, `/payment-status`, deep links with query parameters) all resolve through `index.html`.
+
+- Build uses pnpm: `pnpm run build` (from `apps/web`).
+- Deployment command: `pnpm exec wrangler deploy`.
+- No secrets belong in this frontend Worker — only public `VITE_`-prefixed build variables (`VITE_API_BASE_URL`, `VITE_CHECKOUT_ENABLED`) configured in Cloudflare Workers Builds.
+- The backend Worker (`warungkit-api`, `https://warungkit-api.anotechhub.workers.dev`) is deployed and configured separately and is out of scope for this frontend Worker.
+
+(Note: `docs/runbooks/frontend-pages-deployment.md` and `.github/workflows/deploy-pages.yml` describe an earlier Cloudflare Pages + GitHub Actions approach for this same frontend; the Workers Static Assets setup above is the current target connected in the Cloudflare dashboard.)
 
 ## No Live Payment Integration
 
