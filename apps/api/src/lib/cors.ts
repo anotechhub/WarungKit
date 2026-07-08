@@ -17,7 +17,7 @@ export function createCorsMiddleware(): MiddlewareHandler<{ Bindings: Cloudflare
         return allowedOrigins.includes(origin) ? origin : undefined;
       },
       allowMethods: ["GET", "POST", "OPTIONS"],
-      allowHeaders: ["Content-Type", "X-Request-Id"],
+      allowHeaders: ["Content-Type", "X-Request-Id", "X-Idempotency-Key"],
       credentials: false,
     });
 
