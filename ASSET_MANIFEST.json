@@ -1,0 +1,13 @@
+{
+  "productImages": {
+    "template-konten-instagram-umkm": "/visuals/product-images/template-konten-instagram-umkm.webp",
+    "paket-sop-operasional": "/visuals/product-images/paket-sop-operasional.webp",
+    "sesi-konsultasi-bisnis-30-menit": "/visuals/product-images/sesi-konsultasi-bisnis-30-menit.webp"
+  },
+  "featureIcons": {
+    "mudah-dipakai-umkm": "/visuals/feature-icons/mudah-dipakai-umkm.webp",
+    "tampilan-profesional": "/visuals/feature-icons/tampilan-profesional.webp",
+    "checkout-terpercaya": "/visuals/feature-icons/checkout-terpercaya.webp",
+    "digital-jasa": "/visuals/feature-icons/digital-jasa.webp"
+  }
+}

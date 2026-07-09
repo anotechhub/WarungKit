@@ -1,7 +1,17 @@
 import type { Product } from '@warungkit/contracts'
+import { getProductVisual } from '../lib/product-visuals'
 
 export function ProductVisual({ product, compact = false }: { product: Product; compact?: boolean }) {
   const type = product.slug.includes('instagram') ? 'template' : product.slug.includes('sop') ? 'sop' : 'consultation'
+  const asset = getProductVisual(product.slug)
+
+  if (asset) {
+    return (
+      <div className={`product-visual product-visual--photo ${compact ? 'product-visual--compact' : ''}`}>
+        <img className="wk-product-image" src={asset.src} alt={asset.alt} loading="lazy" />
+      </div>
+    )
+  }
 
   return (
     <div className={`product-visual product-visual--${type} ${compact ? 'product-visual--compact' : ''}`} aria-hidden="true">

@@ -1,21 +1,26 @@
 import {
   ArrowRight, BadgeCheck, Check, ChevronDown, CircleDollarSign, FileCheck2,
-  LockKeyhole, MessageCircleHeart, ShieldCheck, Sparkles, Store,  WalletCards,
+  LockKeyhole, MessageCircleHeart, ShieldCheck, Store,  WalletCards,
 } from 'lucide-react'
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { HeroVisual } from '../components/HeroVisual'
 import { ProductCard } from '../components/ProductCard'
+import { ScrollReveal } from '../components/ScrollReveal'
 import { SectionHeading } from '../components/SectionHeading'
 import { SiteFooter } from '../components/SiteFooter'
 import { SiteHeader } from '../components/SiteHeader'
 import { useProducts } from '../hooks/useProducts'
+import { FEATURE_VISUALS, type FeatureVisualKey } from '../lib/feature-visuals'
 
-const whyItems = [
-  { icon: Store, title: 'Mudah dipakai UMKM', text: 'Mulai dari katalog sederhana yang siap ditata dan dijual.' },
-  { icon: Sparkles, title: 'Tampilan profesional', text: 'Desain bersih dan rapi untuk meningkatkan kepercayaan.' },
-  { icon: ShieldCheck, title: 'Checkout lebih terpercaya', text: 'Alur pembayaran tertata dengan status pesanan yang jelas.' },
-  { icon: WalletCards, title: 'Cocok untuk digital & jasa', text: 'Jual template, SOP, konsultasi, kelas, dan layanan digital.' },
+const whyItems: { key: FeatureVisualKey; title: string; text: string }[] = [
+  { key: 'easy', title: 'Mudah dipakai UMKM', text: 'Mulai dari katalog sederhana yang siap ditata dan dijual.' },
+  { key: 'professional', title: 'Tampilan profesional', text: 'Desain bersih dan rapi untuk meningkatkan kepercayaan.' },
+  { key: 'trusted', title: 'Checkout lebih terpercaya', text: 'Alur pembayaran tertata dengan status pesanan yang jelas.' },
+  { key: 'digitalService', title: 'Cocok untuk digital & jasa', text: 'Jual template, SOP, konsultasi, kelas, dan layanan digital.' },
 ]
+
+const STAGGER_STEP_MS = 90
 
 const steps = [
   { index: '01', icon: Store, title: 'Pilih Produk', text: 'Temukan produk digital atau jasa yang paling relevan.' },
@@ -59,7 +64,7 @@ export function HomePage() {
       <SiteHeader />
       <main id="beranda">
         <section className="hero section-shell">
-          <div className="hero-copy">
+          <div className="hero-copy wk-page-enter">
             <p className="eyebrow">Storefront digital untuk UMKM</p>
             <h1>Jual Produk Digital UMKM dengan <span>Tampilan Premium.</span></h1>
             <p className="hero-copy__body">WarungKit membantu UMKM menjual template, SOP, konsultasi, dan produk digital dengan katalog yang rapi, checkout yang jelas, dan pengalaman yang lebih meyakinkan.</p>
@@ -71,19 +76,37 @@ export function HomePage() {
               <span><Check size={15} /> Mudah dipakai</span><span><Check size={15} /> Katalog profesional</span><span><Check size={15} /> Checkout tertata</span>
             </div>
           </div>
-          <HeroVisual />
+          <div className="wk-page-enter" style={{ '--wk-delay': '120ms' } as CSSProperties}>
+            <HeroVisual />
+          </div>
         </section>
 
         <section id="produk" className="section-shell section-products">
           <SectionHeading eyebrow="Produk unggulan" title="Pilihan Produk Digital Terbaik untuk Bisnismu" align="left" action={<a href="#produk" className="text-link">Lihat Semua Produk <ArrowRight size={16} /></a>} />
           {loading ? <div className="product-grid product-grid--skeleton"><div /><div /><div /></div> : null}
           {error ? <div className="notice notice--error">{error}</div> : null}
-          {!loading && !error ? <div className="product-grid">{products.map((product) => <ProductCard product={product} key={product.id} />)}</div> : null}
+          {!loading && !error ? (
+            <div className="product-grid">
+              {products.map((product, index) => (
+                <ScrollReveal delayMs={index * STAGGER_STEP_MS} key={product.id}>
+                  <ProductCard product={product} />
+                </ScrollReveal>
+              ))}
+            </div>
+          ) : null}
         </section>
 
         <section className="section-shell soft-panel" id="tentang">
           <SectionHeading eyebrow="Kenapa WarungKit" title="Dirancang untuk UMKM yang Ingin Tampil Profesional" body="Bukan sekadar halaman jualan. WarungKit membantu pengalaman belanja terasa lebih rapi dari awal." />
-          <div className="why-grid">{whyItems.map(({ icon: Icon, title, text }) => <div className="why-card" key={title}><span><Icon size={22} /></span><h3>{title}</h3><p>{text}</p></div>)}</div>
+          <div className="why-grid">
+            {whyItems.map(({ key, title, text }, index) => (
+              <ScrollReveal className="why-card" delayMs={index * STAGGER_STEP_MS} key={key}>
+                <span><img className="wk-feature-icon-image" src={FEATURE_VISUALS[key].src} alt="" loading="lazy" /></span>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </ScrollReveal>
+            ))}
+          </div>
         </section>
 
         <section id="cara-kerja" className="section-shell steps-section">
